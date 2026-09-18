@@ -9,6 +9,14 @@ import type {
 import "./load-env.ts";
 import { clusterAttempts } from "./cluster.ts";
 import { maybeCommentOnPullRequest, maybeWriteGitHubSummary } from "./github.ts";
+import {
+  appendRun,
+  buildRecord,
+  labelsFor,
+  loadHistory,
+  saveHistory,
+  storePath,
+} from "./ledger.ts";
 import { toFailedAttempt } from "./playwright-attempt.ts";
 import { scoreClusters } from "./score-run.ts";
 import {
@@ -62,10 +70,13 @@ export default class LatchReporter implements Reporter {
     try {
       this.meta.duration_ms = result.duration;
       const clusters = clusterAttempts(this.attempts);
+      const store = storePath();
+      const history = loadHistory(store);
       const scored = await scoreClusters(clusters, this.meta);
-      const text = formatScoredTerminal(scored, this.attempts.length);
+      const annotations = labelsFor(scored, history);
+      const text = formatScoredTerminal(scored, this.attempts.length, annotations);
       console.log(text);
-      const markdown = formatMarkdown(scored, this.attempts.length, this.meta);
+      const markdown = formatMarkdown(scored, this.attempts.length, this.meta, annotations);
       writeReports(
         "traces",
         {
@@ -75,6 +86,7 @@ export default class LatchReporter implements Reporter {
         },
         markdown,
       );
+      saveHistory(appendRun(history, buildRecord(scored, this.attempts.length)), store);
       maybeWriteGitHubSummary(markdown);
       await maybeCommentOnPullRequest(markdown);
     } catch (error) {

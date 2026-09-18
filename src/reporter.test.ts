@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { mkdtempSync, readFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { test } from "node:test";
 import type {
   FullConfig,
@@ -10,6 +12,7 @@ import type {
 } from "@playwright/test/reporter";
 
 process.env.TYPESAFE_API_KEY = "";
+process.env.LATCH_STORE = join(mkdtempSync(join(tmpdir(), "latch-report-")), "store.json");
 
 function testCase(id: string, title: string): TestCase {
   return {
@@ -80,6 +83,11 @@ test("reporter marks a passed-on-retry attempt flaky and writes the cluster repo
     assert.ok(failedCluster);
     assert.equal(failedCluster.failed_count, 1);
     assert.equal(failedCluster.flaky_count, 0);
+
+    // A second run reads the store written by the first and marks the clusters known.
+    logs.length = 0;
+    await reporter.onEnd({ duration: 124 } as unknown as FullResult);
+    assert.match(logs.join("\n"), /\[seen x1\]/);
   } finally {
     consoleMock.log = original;
   }

@@ -59,6 +59,22 @@ Measured on `testdata/junit/` (live Jev):
 
 The limit is the point: clustering generalizes when the runner exposes a stable `message`/`type`, and falls back to one-cluster-per-test when the raw output is all you have. `go.xml` is the canary.
 
+## Failure ledger (history across runs)
+
+Every run — reporter or CLI — appends its clusters to a local store (`.latch/store.json`, override with `LATCH_STORE`, set it empty to disable). The next run labels each cluster in the terminal and in the markdown:
+
+```
+P0 env_cascade n=4 conf=1.00 same_root=0.83 blocks=0.52  action=ignore_as_infra (env_cascade)  [seen x2]
+P1 assertion_bug n=1 conf=0.98 same_root=0.60 blocks=0.51  action=fix_product (assertion_bug)  [new]
+```
+
+```bash
+npm run latch -- testdata/runs/env-cascade.json --store /tmp/latch-store.json
+# first run: [new] ... second run: [seen x1]
+```
+
+A recurring infra cluster now reads differently from a fresh product failure — the raw material for a flake budget or a trusted merge gate. The store keeps the last 100 runs; in CI it must be cached or committed to persist.
+
 ## Policy (code)
 
 1. No key / API error → `needs_human`

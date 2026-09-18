@@ -51,3 +51,12 @@ test("unscored clusters render their reason so no_key is visible", () => {
   };
   assert.match(formatScoredTerminal([unscored], 5), /action=needs_human \(no_key\)/);
 });
+
+test("history annotations reach the terminal and the markdown", () => {
+  const annotations = new Map([[cluster.signature, "[seen x3, flaky 1]"]]);
+  assert.match(formatScoredTerminal([cluster], 5, annotations), /\[seen x3, flaky 1\]/);
+  assert.match(
+    formatMarkdown([cluster], 5, { workers: 1, retries_config: 0 }, annotations),
+    /- history: \[seen x3, flaky 1\]/,
+  );
+});

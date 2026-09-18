@@ -16,7 +16,11 @@ export function formatTerminal(clusters: Cluster[], failed: number): string {
   return lines.join("\n");
 }
 
-export function formatScoredTerminal(scored: ScoredCluster[], failed: number): string {
+export function formatScoredTerminal(
+  scored: ScoredCluster[],
+  failed: number,
+  annotations?: Map<string, string>,
+): string {
   if (failed === 0 && scored.length === 0) return "Latch: 0 failures";
   const lines = [
     `Latch: ${failed} failed → ${scored.length} cause${scored.length === 1 ? "" : "s"}`,
@@ -32,8 +36,9 @@ export function formatScoredTerminal(scored: ScoredCluster[], failed: number): s
     const blocks =
       cluster.blocks_merge !== undefined ? ` blocks=${cluster.blocks_merge.toFixed(2)}` : "";
     const reason = cluster.action_reason ? ` (${cluster.action_reason})` : "";
+    const history = annotations?.get(cluster.signature);
     lines.push(
-      `P${i} ${cause} n=${cluster.size}${conf}${noul}${blocks}  action=${cluster.action}${reason}`,
+      `P${i} ${cause} n=${cluster.size}${conf}${noul}${blocks}  action=${cluster.action}${reason}${history ? `  ${history}` : ""}`,
     );
     const head = cluster.representative_error.replace(/\s+/g, " ").slice(0, 72);
     lines.push(`     ${head}`);
@@ -45,6 +50,7 @@ export function formatMarkdown(
   scored: ScoredCluster[],
   failed: number,
   meta: RunMeta,
+  annotations?: Map<string, string>,
 ): string {
   const lines = [
     `# Latch`,
@@ -60,6 +66,10 @@ export function formatMarkdown(
     lines.push(`## P${i} ${cluster.cause ?? "unscored"} (n=${cluster.size})`);
     lines.push("");
     lines.push(`- action: \`${cluster.action}\`${cluster.action_reason ? ` (${cluster.action_reason})` : ""}`);
+    const history = annotations?.get(cluster.signature);
+    if (history) {
+      lines.push(`- history: ${history}`);
+    }
     if (cluster.cause_confidence !== undefined) {
       lines.push(`- cause confidence: ${cluster.cause_confidence.toFixed(2)}`);
     }
