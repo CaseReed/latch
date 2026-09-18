@@ -92,6 +92,16 @@ test("the gate blocks on a non-infra cluster and passes on infra noise", () => {
   );
 });
 
+test("a green run is a single line", () => {
+  assert.equal(formatScoredTerminal([], 0), "Latch: 0 failures");
+});
+
+test("a run whose only failures are suppressed passes the gate", () => {
+  const out = formatScoredTerminal([], 8, undefined, 1);
+  assert.match(out, /Latch: 8 failed → 0 causes \(1 suppressed\)/);
+  assert.match(out, /Gate: PASS/);
+});
+
 test("cached clusters are not counted as Jev calls in the footer", () => {
   const cached: ScoredCluster = {
     ...cluster,
