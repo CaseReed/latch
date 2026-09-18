@@ -1,8 +1,8 @@
-![Latch — your CI is red. Is it your code, or the environment?](assets/banner.svg)
+# Latch
 
 [![CI](https://github.com/CaseReed/latch/actions/workflows/ci.yml/badge.svg)](https://github.com/CaseReed/latch/actions/workflows/ci.yml)
 
-Latch reads your test results and returns one verdict before you merge: **`PASS`** (the environment — ignore it) or **`BLOCK`** (a real failure — don't merge). Read-only, no test rewrite, works with the runner you already use.
+**Your CI is red. Is it your code — or the environment?** Latch reads your test results and returns one verdict before you merge: **`PASS`** (the environment — ignore it) or **`BLOCK`** (a real failure — don't merge). Read-only, no test rewrite, works with the runner you already use.
 
 ```bash
 npm install && npm run demo        # no key, no network, ~10 seconds
