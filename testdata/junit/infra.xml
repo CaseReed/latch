@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="checkout" tests="8" failures="8" time="0.9">
+    <testcase classname="checkout.api" name="health" time="0.01">
+      <failure message="Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/">tb</failure>
+    </testcase>
+    <testcase classname="checkout.api" name="cart" time="0.01">
+      <failure message="Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/">tb</failure>
+    </testcase>
+    <testcase classname="checkout.api" name="orders" time="0.01">
+      <failure message="Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/">tb</failure>
+    </testcase>
+    <testcase classname="checkout.api" name="coupon" time="0.01">
+      <failure message="Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/">tb</failure>
+    </testcase>
+    <testcase classname="checkout.api" name="payments" time="0.01">
+      <failure message="Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/">tb</failure>
+    </testcase>
+    <testcase classname="checkout.api" name="refund" time="0.01">
+      <failure message="Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/">tb</failure>
+    </testcase>
+    <testcase classname="checkout.api" name="ship" time="0.01">
+      <failure message="Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/">tb</failure>
+    </testcase>
+    <testcase classname="checkout.api" name="track" time="0.01">
+      <failure message="Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/">tb</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

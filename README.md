@@ -6,6 +6,27 @@ Merge-gate triage for a red test run. Playwright already executed; Latch answers
 
 **Good at**: collapsing an infra cascade (70 identical connection errors → 1 cause) and refusing to silently ignore a non-infra failure. **Not good at**: grouping a logic regression whose many tests fail with different assertion messages — those fragment into separate clusters (see [Limits](#limits) and `experiments/click-real`).
 
+## Try it in 2 minutes
+
+No key, no network, no CI needed:
+
+```bash
+npm install
+npm run demo
+```
+
+It runs the real CLI on two seeded cases and prints the decision CI would act on:
+
+```
+Latch: 8 failed → 1 cause
+P0 env_cascade n=8 conf=1.00 same_root=0.90 blocks=0.40  action=ignore_as_infra (env_cascade)
+Gate: PASS (no blocking cluster)                    # exit 0 — merge
+
+Latch: 5 failed → 1 cause
+P0 assertion_bug n=5 conf=1.00 same_root=0.80 blocks=0.60  action=fix_product (assertion_bug)
+Gate: BLOCK — 1 cluster to look at                  # exit 1 — do not merge
+```
+
 ## Install
 
 ```ts

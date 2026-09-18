@@ -11,6 +11,7 @@
     "test:e2e": "tsx src/e2e-check.ts",
     "test:stability": "tsx src/stability-check.ts",
     "calibrate": "tsx experiments/calibration/calibrate.ts",
+    "demo": "tsx experiments/demo/demo.ts",
     "latch": "tsx src/cli.ts",
     "print:clusters": "tsx src/print-clusters.ts testdata/runs/env-cascade.json"
   },
