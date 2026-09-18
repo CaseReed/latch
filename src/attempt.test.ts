@@ -56,3 +56,20 @@ test("signature is apiName plus normalized head, not the test title", () => {
   assert.equal(a.startsWith("page.goto|"), true);
   assert.doesNotMatch(a, /login/i);
 });
+
+test("volatile timestamps, durations and id tokens normalize; words do not", () => {
+  assert.match(normalizeErrorHead("request 2026-09-19T12:34:56.789Z failed"), /<time>/);
+  assert.match(normalizeErrorHead("Timeout 137ms exceeded"), /<duration>/);
+  assert.match(normalizeErrorHead("upstream 500 for request k3j9f2a8b1"), /<token>/);
+
+  const head = normalizeErrorHead("TimeoutError: locator.waitFor: Timeout 100ms exceeded.");
+  assert.match(head, /TimeoutError/);
+  assert.doesNotMatch(head, /<token>/);
+  assert.match(head, /<duration>/);
+});
+
+test("two runs of the same volatile failure share a signature", () => {
+  const a = signatureOf({ apiName: "unknown", errorMessage: "upstream 500 for request abc123def4" });
+  const b = signatureOf({ apiName: "unknown", errorMessage: "upstream 500 for request zzz999yyy8" });
+  assert.equal(a, b);
+});

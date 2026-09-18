@@ -32,9 +32,10 @@ Also: `traces/latch-report.json`, `traces/latch.md` (with a Jev calls / tokens /
 ## Proof
 
 ```bash
-npm run test:unit          # 30 tests, goldens + hooks, no network
+npm run test:unit          # 60 tests, goldens + hooks, no network
 npm run print:clusters     # 73 failed → 4 causes, n=70
 npm run test:e2e           # real Playwright, intentional failures, no key needed
+npm run test:stability     # signature stability over repeated runs (browser, ~30s)
 npm run test:live          # Jev on goldens; skips without a key
 ```
 
@@ -95,7 +96,8 @@ Thresholds are calibrated against observed Jev output (`blocks_merge` sits ~0.45
 
 ## Limits
 
-- Signature = `apiName` + first 80 chars of the normalized error (ANSI/UUID/long-hex/pixel-diff stripped). Errors that only differ past char 80 collapse into one cluster.
+- Signature = `apiName` + first 80 chars of the normalized error. Normalization strips ANSI, UUIDs, long hex/id tokens, ISO timestamps, durations and pixel diffs; ports stay because they are part of a service's identity. Errors that only differ past char 80 collapse into one cluster.
+- `npm run test:stability` runs real volatile failures repeatedly and fails on unexpected drift (currently 7/8 fixtures stable; the random-port case is documented as known drift).
 - The Jev state is redacted (Bearer / `sk-` `ts_` shaped keys / `password|token|secret|api_key=` assignments) before it leaves the machine. Signatures are still computed on the raw message. Test data is otherwise sent to TypeSafe as-is.
 - At most 8 Jev calls; remaining clusters are `unscored`.
 
