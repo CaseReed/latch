@@ -6,15 +6,17 @@
     "node": ">=20"
   },
   "scripts": {
-    "test:unit": "tsx --test src/attempt.test.ts src/cluster.test.ts src/policy.test.ts src/github.test.ts src/redact.test.ts src/reporter.test.ts src/summarize.test.ts",
+    "test:unit": "tsx --test src/attempt.test.ts src/cluster.test.ts src/policy.test.ts src/github.test.ts src/redact.test.ts src/reporter.test.ts src/summarize.test.ts src/ingest/junit.test.ts",
     "test:live": "tsx --test src/reporter.live.test.ts",
     "test:e2e": "tsx src/e2e-check.ts",
+    "latch": "tsx src/cli.ts",
     "print:clusters": "tsx src/print-clusters.ts testdata/runs/env-cascade.json"
   },
   "dependencies": {
     "@playwright/test": "^1.63.0",
     "@typesafe-ai/sdk": "^0.6.0",
-    "dotenv": "^18.0.0"
+    "dotenv": "^18.0.0",
+    "fast-xml-parser": "^5.11.1"
   },
   "devDependencies": {
     "@types/node": "^26.6.1",

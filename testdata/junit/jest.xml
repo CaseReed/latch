@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="jest tests" tests="6" failures="5" errors="0" time="4.21">
+  <testsuite name="checkout" errors="0" tests="6" failures="5" skipped="0" time="4.21">
+    <testcase classname="checkout.cart" name="adds an item" time="0.12">
+      <failure message="connect ECONNREFUSED 127.0.0.1:5432" type="Error">Error: connect ECONNREFUSED 127.0.0.1:5432
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1187:16)</failure>
+    </testcase>
+    <testcase classname="checkout.cart" name="removes an item" time="0.11">
+      <failure message="connect ECONNREFUSED 127.0.0.1:5432" type="Error">Error: connect ECONNREFUSED 127.0.0.1:5432
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1187:16)</failure>
+    </testcase>
+    <testcase classname="checkout.orders" name="lists orders" time="0.13">
+      <failure message="connect ECONNREFUSED 127.0.0.1:5432" type="Error">Error: connect ECONNREFUSED 127.0.0.1:5432
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1187:16)</failure>
+    </testcase>
+    <testcase classname="checkout.orders" name="cancels an order" time="0.14">
+      <failure message="connect ECONNREFUSED 127.0.0.1:5432" type="Error">Error: connect ECONNREFUSED 127.0.0.1:5432
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1187:16)</failure>
+    </testcase>
+    <testcase classname="checkout.total" name="shows the total" time="0.2">
+      <failure message="expect(received).toBe(expected) // Object.is equality" type="Error">Error: expect(received).toBe(expected)
+Expected: 4200
+Received: 4100</failure>
+    </testcase>
+    <testcase classname="checkout.total" name="shows the tax" time="0.05"/>
+  </testsuite>
+</testsuites>

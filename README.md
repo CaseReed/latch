@@ -40,6 +40,25 @@ npm run test:live          # Jev on goldens; skips without a key
 
 `test:e2e` runs real Playwright specs that are meant to fail and asserts `traces/latch-report.json`; it blanks the key so it stays offline. Live is **node:test**, not a Playwright spec, so a golden “73 failed” is never mixed with a `Latch: 0 failures`.
 
+## Any runner (JUnit XML)
+
+```bash
+npm run latch -- testdata/junit/jest.xml   # or any .xml / golden .json
+```
+
+The same core (clustering + policy) runs on any JUnit report, no Playwright needed:
+
+- `apiName`: Playwright patterns first, else the JUnit `failure`/`error` `type` (`AssertionError`, `ConnectionRefusedError`, …), else `unknown`.
+- `errorMessage`: the stable `message` attribute when present, else the raw text. XML is validated before parsing.
+
+Measured on `testdata/junit/` (live Jev):
+
+- **jest**: 5 failed → 2 causes. 4× `ECONNREFUSED 127.0.0.1:5432` → `ignore_as_infra`; the `expect` mismatch → `fix_product`.
+- **pytest**: 3 failed → 2 causes. `assert 4100 == 4200` ×2 → `fix_product`; `ConnectionRefusedError` → `ignore_as_infra`.
+- **go**: 3 failed → 3 causes, no collapse — the only signal embeds the test name.
+
+The limit is the point: clustering generalizes when the runner exposes a stable `message`/`type`, and falls back to one-cluster-per-test when the raw output is all you have. `go.xml` is the canary.
+
 ## Policy (code)
 
 1. No key / API error → `needs_human`
