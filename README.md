@@ -4,6 +4,8 @@
 
 Merge-gate triage for a red test run. Playwright already executed; Latch answers the only question that matters before merging: **is this red an infra outage I can ignore, or a real failure I must look at?**
 
+> **Who it's for**: teams running Playwright (or Jest/pytest) on GitHub Actions whose suite goes red for infra or flaky reasons — not another dashboard, just a verdict before merging.
+
 **Latch does not modify your tests.** Read-only reporter: cluster first, then one TypeSafe Jev `systemOne` per cluster (max 8, 3 in flight). No remap, no click, no wrapper `test()`. Code owns the final `action`; Jev's own `action` answer only corroborates the product branch.
 
 **Good at**: collapsing an infra cascade (70 identical connection errors → 1 cause) and refusing to silently ignore a non-infra failure. **Not good at**: grouping a logic regression whose many tests fail with different assertion messages — those fragment into separate clusters (see [Limits](#limits) and `experiments/click-real`).
