@@ -1,7 +1,5 @@
-import { readFileSync } from "node:fs";
-import { extname } from "node:path";
 import { clusterAttempts } from "./cluster.ts";
-import { ingestJUnit } from "./ingest/junit.ts";
+import { loadRunFile } from "./golden.ts";
 import {
   judgmentCache,
   loadHistory,
@@ -16,7 +14,6 @@ import "./load-env.ts";
 import { isBlocking } from "./policy.ts";
 import { MAX_JEV_CLUSTERS, scoreClusters } from "./score-run.ts";
 import { formatScoredTerminal } from "./summarize.ts";
-import type { FailedAttempt, RunMeta } from "./types.ts";
 
 const USAGE = [
   "usage:",
@@ -27,8 +24,6 @@ const USAGE = [
   "",
   "  --gate exits non-zero when a non-infra cluster would block a merge.",
 ].join("\n");
-
-type GoldenLike = { run?: RunMeta; attempts?: FailedAttempt[] };
 
 function parseArgs(argv: string[]): { tokens: string[]; store: string; gate: boolean } {
   const tokens: string[] = [];
@@ -48,20 +43,8 @@ function parseArgs(argv: string[]): { tokens: string[]; store: string; gate: boo
   return { tokens, store, gate };
 }
 
-function readInput(path: string): { run: RunMeta; attempts: FailedAttempt[] } {
-  const raw = readFileSync(path, "utf8");
-  if (extname(path).toLowerCase() === ".xml") {
-    return ingestJUnit(raw);
-  }
-  const data = JSON.parse(raw) as GoldenLike;
-  if (!Array.isArray(data.attempts)) {
-    throw new Error(`${path}: expected a golden JSON with { run, attempts }`);
-  }
-  return { run: data.run ?? { workers: 1, retries_config: 0 }, attempts: data.attempts };
-}
-
 async function analyze(path: string, store: string, gate: boolean): Promise<void> {
-  const { run, attempts } = readInput(path);
+  const { run, attempts } = loadRunFile(path);
   const clusters = clusterAttempts(attempts);
   const history = store ? loadHistory(store) : undefined;
   const cache = history ? judgmentCache(history) : undefined;
