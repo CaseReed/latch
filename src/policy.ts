@@ -1,7 +1,10 @@
 const CAUSE_CONFIDENCE_MIN = 0.55;
 const SAME_ROOT_MIN = 0.5;
 const SAME_ROOT_INFRA = 0.7;
-const BLOCKS_MERGE_PRODUCT = 0.5;
+// Jev's blocks_merge for a given cluster varies by ~±0.03 and sits around 0.45–0.62.
+// 0.55 is in the empty gap between the ambiguous band (<=0.51) and the clear
+// product cases (>=0.59), so it does not flip on model noise.
+const BLOCKS_MERGE_PRODUCT = 0.55;
 
 // An explicit infra fingerprint. A false "ignore" hides a real bug, so only
 // these messages may silence a cluster; anything else falls back to a human.

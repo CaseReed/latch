@@ -110,10 +110,10 @@ Jev judgments are cached per signature: a cluster already judged is reused (`[ca
 4. `env_cascade`, `same_root >= 0.7` **and the error matches an infra fingerprint** (CONNREFUSED, DNS, reset, gateway…) → `ignore_as_infra`; otherwise `needs_human` (`env_cascade_unconfirmed`)
 5. `flake` and `flaky_count >= 1` → `fix_test`
 6. `locator_drift` → `fix_test`
-7. `assertion_bug` and (`blocks_merge >= 0.5` or Jev `action = fix_product`) → `fix_product`
+7. `assertion_bug` and (`blocks_merge >= 0.55` or Jev `action = fix_product`) → `fix_product`
 8. else → `needs_human`
 
-Thresholds are calibrated against observed Jev output (`blocks_merge` sits ~0.45–0.60, so the old 0.6 gate never fired and `fix_product` was unreachable).
+Thresholds are calibrated against observed Jev output. `blocks_merge` varies ~±0.03 around 0.45–0.62 for a given cluster; 0.55 sits in the empty gap between the ambiguous band (≤0.51) and clear product cases (≥0.59), so the verdict no longer flips on model noise. `npm run calibrate` re-measures the flip rate on the borderline clusters (currently 0/7 shipped, vs 1/7 for a model-authority policy).
 
 ## Limits
 

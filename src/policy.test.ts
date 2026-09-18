@@ -106,6 +106,17 @@ test("assertion_bug at the calibrated threshold is fix_product", () => {
   );
 });
 
+test("assertion_bug inside the model's noise band needs a human unless Jev confirms", () => {
+  assert.deepEqual(
+    decideAction(base({ cause: "assertion_bug", blocks_merge: 0.52 })),
+    { action: "needs_human", reason: "no_rule" },
+  );
+  assert.deepEqual(
+    decideAction(base({ cause: "assertion_bug", blocks_merge: 0.52, jev_action: "fix_product" })),
+    { action: "fix_product", reason: "assertion_bug" },
+  );
+});
+
 test("assertion_bug below threshold but Jev says fix_product is fix_product", () => {
   assert.deepEqual(
     decideAction(base({ cause: "assertion_bug", blocks_merge: 0.4, jev_action: "fix_product" })),
