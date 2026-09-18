@@ -14,6 +14,11 @@ test("redacts api-key shaped tokens", () => {
   assert.match(out, /<redacted-key>/);
 });
 
+test("a key-shaped token must contain a digit, so plain identifiers survive", () => {
+  assert.equal(redactSecrets("ts_config is missing"), "ts_config is missing");
+  assert.equal(redactSecrets("pk_customer_id"), "pk_customer_id");
+});
+
 test("redacts password and token assignments", () => {
   assert.equal(redactSecrets("password=hunter2"), "password=<redacted>");
   assert.equal(redactSecrets("token: abcdef"), "token: <redacted>");

@@ -52,3 +52,21 @@ test("zero attempts is zero clusters", () => {
   assert.deepEqual(clusterAttempts([]), []);
   assert.equal(formatTerminal([], 0), "Latch: 0 failures");
 });
+
+test("secrets in error text are redacted before they reach any report", () => {
+  const clusters = clusterAttempts([
+    {
+      title: "login",
+      location: "tests/login.spec.ts:1",
+      status: "failed",
+      apiName: "page.goto",
+      errorMessage:
+        "page.goto failed: Authorization: Bearer abc123def456 token=sk_abc123456",
+    },
+  ]);
+  const error = clusters[0]?.representative_error ?? "";
+  assert.doesNotMatch(error, /abc123def456/);
+  assert.doesNotMatch(error, /sk_abc123456/);
+  assert.match(error, /Bearer <redacted>/);
+  assert.match(error, /<redacted-key>/);
+});

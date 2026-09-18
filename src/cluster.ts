@@ -1,4 +1,5 @@
 import { signatureOf } from "./attempt.ts";
+import { redactSecrets } from "./redact.ts";
 import type { Cluster, FailedAttempt } from "./types.ts";
 
 const SAMPLE_CAP = 5;
@@ -25,8 +26,8 @@ export function clusterAttempts(attempts: FailedAttempt[]): Cluster[] {
       size: items.length,
       failed_count: items.length - flaky_count,
       flaky_count,
-      representative_error: (items[0]?.errorMessage ?? "").slice(0, 500),
-      sample_titles: unique(items.map((item) => item.title)).slice(0, SAMPLE_CAP),
+      representative_error: redactSecrets((items[0]?.errorMessage ?? "").slice(0, 500)),
+      sample_titles: unique(items.map((item) => redactSecrets(item.title))).slice(0, SAMPLE_CAP),
       sample_locations: unique(items.map((item) => item.location)).slice(0, SAMPLE_CAP),
     });
   }
