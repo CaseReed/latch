@@ -3,6 +3,29 @@ const SAME_ROOT_MIN = 0.5;
 const SAME_ROOT_INFRA = 0.7;
 const BLOCKS_MERGE_PRODUCT = 0.5;
 
+// An explicit infra fingerprint. A false "ignore" hides a real bug, so only
+// these messages may silence a cluster; anything else falls back to a human.
+const INFRA_PATTERNS: RegExp[] = [
+  /\bE(?:CONNREFUSED|CONNRESET|TIMEDOUT|NOTFOUND|AI_AGAIN|NETUNREACH|HOSTUNREACH|PIPE)\b/,
+  /\bERR_CONNECTION_(?:REFUSED|RESET|TIMED_OUT|CLOSED|ABORTED)\b/,
+  /\bERR_(?:NAME_NOT_RESOLVED|PROXY_CONNECTION_FAILED|NETWORK_CHANGED|ADDRESS_UNREACHABLE|INTERNET_DISCONNECTED)\b/,
+  /\bConnection refused\b/i,
+  /\bConnection reset by peer\b/i,
+  /\bNo route to host\b/i,
+  /\bNetwork is unreachable\b/i,
+  /\bTemporary failure in name resolution\b/i,
+  /\bName or service not known\b/i,
+  /\bgetaddrinfo\b/,
+  /\bsocket hang up\b/i,
+  /\bBad Gateway\b/i,
+  /\bService Unavailable\b/i,
+  /\bGateway Timeout\b/i,
+];
+
+export function isInfraError(message: string): boolean {
+  return INFRA_PATTERNS.some((pattern) => pattern.test(message));
+}
+
 export type PolicyInput = {
   cause?: string;
   cause_confidence?: number;
@@ -11,6 +34,8 @@ export type PolicyInput = {
   flaky_count: number;
   /** Jev's own `action` answer, used only to corroborate the product branch. */
   jev_action?: string;
+  /** The clustered error text, required to confirm an infra outage. */
+  representative_error?: string;
   error?: string;
 };
 
@@ -25,7 +50,10 @@ export function decideAction(input: PolicyInput): { action: string; reason: stri
     return { action: "needs_human", reason: "low_same_root" };
   }
   if (input.cause === "env_cascade" && (input.same_root ?? 0) >= SAME_ROOT_INFRA) {
-    return { action: "ignore_as_infra", reason: "env_cascade" };
+    if (isInfraError(input.representative_error ?? "")) {
+      return { action: "ignore_as_infra", reason: "env_cascade" };
+    }
+    return { action: "needs_human", reason: "env_cascade_unconfirmed" };
   }
   if (input.cause === "flake" && input.flaky_count >= 1) {
     return { action: "fix_test", reason: "flake" };

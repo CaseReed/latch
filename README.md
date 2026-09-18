@@ -88,7 +88,7 @@ Jev judgments are cached per signature: a cluster already judged is reused (`[ca
 1. No key / API error → `needs_human`
 2. `cause.confidence < 0.55` → `needs_human`
 3. `same_root < 0.5` → `needs_human` (`low_same_root`)
-4. `env_cascade` and `same_root >= 0.7` → `ignore_as_infra`
+4. `env_cascade`, `same_root >= 0.7` **and the error matches an infra fingerprint** (CONNREFUSED, DNS, reset, gateway…) → `ignore_as_infra`; otherwise `needs_human` (`env_cascade_unconfirmed`)
 5. `flake` and `flaky_count >= 1` → `fix_test`
 6. `locator_drift` → `fix_test`
 7. `assertion_bug` and (`blocks_merge >= 0.5` or Jev `action = fix_product`) → `fix_product`

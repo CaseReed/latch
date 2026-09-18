@@ -43,6 +43,7 @@ function scored(cluster: Cluster, answers: CachedJudgment, cached: boolean): Sco
     blocks_merge: answers.blocks_merge,
     flaky_count: cluster.flaky_count,
     jev_action: answers.jev_action,
+    representative_error: cluster.representative_error,
   });
   return {
     ...cluster,

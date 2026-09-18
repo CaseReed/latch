@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { decideAction, type PolicyInput } from "./policy.ts";
+import { decideAction, isInfraError, type PolicyInput } from "./policy.ts";
 
 function base(overrides: Partial<PolicyInput> = {}): PolicyInput {
   return {
@@ -26,11 +26,49 @@ test("low cause confidence needs a human", () => {
   });
 });
 
-test("env_cascade with same_root is ignore_as_infra", () => {
+test("env_cascade with same_root and an infra fingerprint is ignore_as_infra", () => {
   assert.deepEqual(
-    decideAction(base({ cause: "env_cascade", same_root: 0.96 })),
+    decideAction(
+      base({
+        cause: "env_cascade",
+        same_root: 0.96,
+        representative_error:
+          "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/",
+      }),
+    ),
     { action: "ignore_as_infra", reason: "env_cascade" },
   );
+});
+
+test("env_cascade without an infra fingerprint needs a human, never a silent ignore", () => {
+  assert.deepEqual(
+    decideAction(
+      base({
+        cause: "env_cascade",
+        same_root: 0.96,
+        representative_error: "FileNotFoundError: [Errno 2] No such file or directory",
+      }),
+    ),
+    { action: "needs_human", reason: "env_cascade_unconfirmed" },
+  );
+});
+
+test("isInfraError recognizes network outages but not local failures", () => {
+  assert.equal(
+    isInfraError("Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/"),
+    true,
+  );
+  assert.equal(isInfraError("connect ECONNREFUSED 127.0.0.1:5432"), true);
+  assert.equal(
+    isInfraError("urllib.error.URLError: <urlopen error [Errno 61] Connection refused>"),
+    true,
+  );
+  assert.equal(isInfraError("getaddrinfo ENOTFOUND api.example.com"), true);
+  assert.equal(isInfraError("socket hang up"), true);
+  assert.equal(isInfraError("FileNotFoundError: [Errno 2] No such file or directory"), false);
+  assert.equal(isInfraError("KeyError: 'error_rate'"), false);
+  assert.equal(isInfraError("assert 4100 == 4200"), false);
+  assert.equal(isInfraError(""), false);
 });
 
 test("flake with a flaky attempt is fix_test", () => {

@@ -36,6 +36,7 @@ test("live: Jev labels env_cascade, flake, locator_drift, assertion_bug", { skip
       blocks_merge: top.blocks_merge,
       flaky_count: top.flaky_count,
       jev_action: top.jev_action,
+      representative_error: top.representative_error,
     });
     assert.equal(top.action, expected.action, `${item.name} policy`);
     if ("action" in item) assert.equal(top.action, item.action, `${item.name} action`);
