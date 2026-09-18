@@ -1,5 +1,7 @@
 # Latch
 
+[![CI](https://github.com/CaseReed/latch/actions/workflows/ci.yml/badge.svg)](https://github.com/CaseReed/latch/actions/workflows/ci.yml)
+
 Merge-gate triage for a red test run. Playwright already executed; Latch answers the only question that matters before merging: **is this red an infra outage I can ignore, or a real failure I must look at?**
 
 **Latch does not modify your tests.** Read-only reporter: cluster first, then one TypeSafe Jev `systemOne` per cluster (max 8, 3 in flight). No remap, no click, no wrapper `test()`. Code owns the final `action`; Jev's own `action` answer only corroborates the product branch.
