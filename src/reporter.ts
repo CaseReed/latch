@@ -74,7 +74,7 @@ export default class LatchReporter implements Reporter {
       const store = storePath();
       const history = loadHistory(store);
       const scored = await scoreClusters(clusters, this.meta);
-      const annotations = labelsFor(scored, history);
+      const annotations = store ? labelsFor(scored, history) : undefined;
       const { active, suppressed } = splitSuppressed(scored, history);
       const text = formatScoredTerminal(active, this.attempts.length, annotations, suppressed.length);
       console.log(text);

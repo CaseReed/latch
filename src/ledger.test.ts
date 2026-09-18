@@ -138,6 +138,20 @@ test("a legacy store without suppressions loads with an empty list", () => {
   assert.deepEqual(loadHistory(path).suppressed, []);
 });
 
+test("loadHistory drops unusable runs and treats corrupt JSON as no history", () => {
+  const dir = mkdtempSync(join(tmpdir(), "latch-corrupt-"));
+  const malformed = join(dir, "malformed.json");
+  writeFileSync(
+    malformed,
+    JSON.stringify({ version: 1, runs: [run("at", [["a|x", 1, 0]]), { at: "x" }, null, 7] }),
+  );
+  assert.equal(loadHistory(malformed).runs.length, 1);
+
+  const corrupt = join(dir, "corrupt.json");
+  writeFileSync(corrupt, "{ not json");
+  assert.deepEqual(loadHistory(corrupt), emptyHistory());
+});
+
 test("buildRecord captures the scored clusters and labelsFor maps signatures", () => {
   const record = buildRecord([cluster({ cause: "env_cascade" })], 4, "at", "ci-7");
   assert.equal(record.label, "ci-7");

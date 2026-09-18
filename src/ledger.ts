@@ -47,6 +47,10 @@ export function emptyHistory(): History {
   return { version: 1, runs: [], suppressed: [] };
 }
 
+function usableRun(run: unknown): run is RunRecord {
+  return Boolean(run) && typeof run === "object" && Array.isArray((run as RunRecord).clusters);
+}
+
 /** Read the store; a missing or unreadable file is treated as no history. */
 export function loadHistory(path: string): History {
   if (!path || !existsSync(path)) return emptyHistory();
@@ -54,7 +58,7 @@ export function loadHistory(path: string): History {
     const parsed = JSON.parse(readFileSync(path, "utf8")) as Partial<History>;
     return {
       version: 1,
-      runs: Array.isArray(parsed.runs) ? parsed.runs : [],
+      runs: Array.isArray(parsed.runs) ? parsed.runs.filter(usableRun) : [],
       suppressed: Array.isArray(parsed.suppressed)
         ? parsed.suppressed.filter((entry): entry is string => typeof entry === "string")
         : [],

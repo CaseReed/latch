@@ -61,8 +61,9 @@ async function analyze(path: string, store: string): Promise<void> {
   const history = loadHistory(store);
   const scored = await scoreClusters(clusters, run);
   const { active, suppressed } = splitSuppressed(scored, history);
+  const annotations = store ? labelsFor(scored, history) : undefined;
   console.log(
-    formatScoredTerminal(active, attempts.length, labelsFor(scored, history), suppressed.length),
+    formatScoredTerminal(active, attempts.length, annotations, suppressed.length),
   );
   saveHistory(appendRun(history, buildRecord(scored, attempts.length)), store);
 }
