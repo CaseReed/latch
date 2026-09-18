@@ -8,3 +8,6 @@ playwright-report/
 blob-report/
 playwright/.cache/
 .DS_Store
+
+__pycache__/
+*.pyc
