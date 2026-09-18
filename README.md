@@ -32,7 +32,7 @@ flowchart LR
     policy -->|real failure| block["🔴 Gate: BLOCK"]
 ```
 
-Clustering and the final decision are **code**. The model only supplies judgment, and never gets to say "ignore" on its own.
+Clustering and the final decision are **code**. The judge is **TypeSafe's Jev** (`systemOne`): one call per cluster, up to 8, and it never gets to say "ignore" on its own.
 
 ## Why teams use it
 

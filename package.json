@@ -1,6 +1,36 @@
 {
   "name": "latch",
+  "version": "0.1.0",
   "private": true,
+  "description": "Merge-gate triage for a red CI run: cluster the failures, let TypeSafe Jev label the cause, and return Gate: PASS (infra noise) or Gate: BLOCK (a real failure). Works with Playwright, Jest and pytest.",
+  "keywords": [
+    "playwright",
+    "playwright-reporter",
+    "jest",
+    "pytest",
+    "junit",
+    "flaky-tests",
+    "flaky-test-detection",
+    "ci",
+    "ci-cd",
+    "merge-gate",
+    "test-automation",
+    "test-reporting",
+    "github-actions",
+    "jev",
+    "typesafe",
+    "typesafe-ai",
+    "ai"
+  ],
+  "homepage": "https://github.com/CaseReed/latch#readme",
+  "bugs": {
+    "url": "https://github.com/CaseReed/latch/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CaseReed/latch.git"
+  },
+  "license": "MIT",
   "type": "module",
   "engines": {
     "node": ">=20"
