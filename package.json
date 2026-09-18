@@ -1,0 +1,23 @@
+{
+  "name": "latch",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test:unit": "tsx --test src/attempt.test.ts src/cluster.test.ts src/policy.test.ts src/github.test.ts",
+    "test:live": "npx playwright test tests/reporter.live.spec.ts",
+    "print:clusters": "tsx src/print-clusters.ts testdata/runs/env-cascade.json"
+  },
+  "dependencies": {
+    "@playwright/test": "^1.63.0",
+    "@typesafe-ai/sdk": "^0.6.0",
+    "dotenv": "^18.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.1",
+    "tsx": "^4.23.13",
+    "typescript": "^7.0.2"
+  }
+}

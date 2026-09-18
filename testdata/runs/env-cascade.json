@@ -1,0 +1,521 @@
+{
+  "run": {
+    "workers": 4,
+    "retries_config": 1,
+    "duration_ms": 42000,
+    "test_count": 73
+  },
+  "attempts": [
+    {
+      "title": "spec 0 loads dashboard",
+      "location": "tests/suite-00.spec.ts:10",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 1 loads dashboard",
+      "location": "tests/suite-01.spec.ts:11",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 2 loads dashboard",
+      "location": "tests/suite-02.spec.ts:12",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 3 loads dashboard",
+      "location": "tests/suite-03.spec.ts:13",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 4 loads dashboard",
+      "location": "tests/suite-04.spec.ts:14",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 5 loads dashboard",
+      "location": "tests/suite-05.spec.ts:15",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 6 loads dashboard",
+      "location": "tests/suite-06.spec.ts:16",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 7 loads dashboard",
+      "location": "tests/suite-07.spec.ts:17",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 8 loads dashboard",
+      "location": "tests/suite-08.spec.ts:18",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 9 loads dashboard",
+      "location": "tests/suite-09.spec.ts:19",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 10 loads dashboard",
+      "location": "tests/suite-10.spec.ts:20",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 11 loads dashboard",
+      "location": "tests/suite-11.spec.ts:21",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 12 loads dashboard",
+      "location": "tests/suite-12.spec.ts:22",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 13 loads dashboard",
+      "location": "tests/suite-13.spec.ts:23",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 14 loads dashboard",
+      "location": "tests/suite-14.spec.ts:24",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 15 loads dashboard",
+      "location": "tests/suite-15.spec.ts:25",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 16 loads dashboard",
+      "location": "tests/suite-16.spec.ts:26",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 17 loads dashboard",
+      "location": "tests/suite-17.spec.ts:27",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 18 loads dashboard",
+      "location": "tests/suite-18.spec.ts:28",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 19 loads dashboard",
+      "location": "tests/suite-19.spec.ts:29",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 20 loads dashboard",
+      "location": "tests/suite-20.spec.ts:30",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 21 loads dashboard",
+      "location": "tests/suite-21.spec.ts:31",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 22 loads dashboard",
+      "location": "tests/suite-22.spec.ts:32",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 23 loads dashboard",
+      "location": "tests/suite-23.spec.ts:33",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 24 loads dashboard",
+      "location": "tests/suite-24.spec.ts:34",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 25 loads dashboard",
+      "location": "tests/suite-25.spec.ts:35",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 26 loads dashboard",
+      "location": "tests/suite-26.spec.ts:36",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 27 loads dashboard",
+      "location": "tests/suite-27.spec.ts:37",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 28 loads dashboard",
+      "location": "tests/suite-28.spec.ts:38",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 29 loads dashboard",
+      "location": "tests/suite-29.spec.ts:39",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 30 loads dashboard",
+      "location": "tests/suite-30.spec.ts:40",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 31 loads dashboard",
+      "location": "tests/suite-31.spec.ts:41",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 32 loads dashboard",
+      "location": "tests/suite-32.spec.ts:42",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 33 loads dashboard",
+      "location": "tests/suite-33.spec.ts:43",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 34 loads dashboard",
+      "location": "tests/suite-34.spec.ts:44",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 35 loads dashboard",
+      "location": "tests/suite-35.spec.ts:45",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 36 loads dashboard",
+      "location": "tests/suite-36.spec.ts:46",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 37 loads dashboard",
+      "location": "tests/suite-37.spec.ts:47",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 38 loads dashboard",
+      "location": "tests/suite-38.spec.ts:48",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 39 loads dashboard",
+      "location": "tests/suite-39.spec.ts:49",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 40 loads dashboard",
+      "location": "tests/suite-40.spec.ts:10",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 41 loads dashboard",
+      "location": "tests/suite-41.spec.ts:11",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 42 loads dashboard",
+      "location": "tests/suite-42.spec.ts:12",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 43 loads dashboard",
+      "location": "tests/suite-43.spec.ts:13",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 44 loads dashboard",
+      "location": "tests/suite-44.spec.ts:14",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 45 loads dashboard",
+      "location": "tests/suite-45.spec.ts:15",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 46 loads dashboard",
+      "location": "tests/suite-46.spec.ts:16",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 47 loads dashboard",
+      "location": "tests/suite-47.spec.ts:17",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 48 loads dashboard",
+      "location": "tests/suite-48.spec.ts:18",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 49 loads dashboard",
+      "location": "tests/suite-49.spec.ts:19",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 50 loads dashboard",
+      "location": "tests/suite-50.spec.ts:20",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 51 loads dashboard",
+      "location": "tests/suite-51.spec.ts:21",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 52 loads dashboard",
+      "location": "tests/suite-52.spec.ts:22",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 53 loads dashboard",
+      "location": "tests/suite-53.spec.ts:23",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 54 loads dashboard",
+      "location": "tests/suite-54.spec.ts:24",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 55 loads dashboard",
+      "location": "tests/suite-55.spec.ts:25",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 56 loads dashboard",
+      "location": "tests/suite-56.spec.ts:26",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 57 loads dashboard",
+      "location": "tests/suite-57.spec.ts:27",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 58 loads dashboard",
+      "location": "tests/suite-58.spec.ts:28",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 59 loads dashboard",
+      "location": "tests/suite-59.spec.ts:29",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 60 loads dashboard",
+      "location": "tests/suite-60.spec.ts:30",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 61 loads dashboard",
+      "location": "tests/suite-61.spec.ts:31",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 62 loads dashboard",
+      "location": "tests/suite-62.spec.ts:32",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 63 loads dashboard",
+      "location": "tests/suite-63.spec.ts:33",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 64 loads dashboard",
+      "location": "tests/suite-64.spec.ts:34",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 65 loads dashboard",
+      "location": "tests/suite-65.spec.ts:35",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 66 loads dashboard",
+      "location": "tests/suite-66.spec.ts:36",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 67 loads dashboard",
+      "location": "tests/suite-67.spec.ts:37",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 68 loads dashboard",
+      "location": "tests/suite-68.spec.ts:38",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "spec 69 loads dashboard",
+      "location": "tests/suite-69.spec.ts:39",
+      "status": "failed",
+      "apiName": "page.goto",
+      "errorMessage": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/\nCall log:\n  - navigating to \"http://localhost:8080/\", waiting until \"load\""
+    },
+    {
+      "title": "welcome copy",
+      "location": "tests/assert-text.spec.ts:12",
+      "status": "failed",
+      "apiName": "expect.toHaveText",
+      "errorMessage": "Error: expect(locator).toHaveText() failed\n\nExpected string: \"Welcome\"\nReceived string: \"Hi there\""
+    },
+    {
+      "title": "submit visible",
+      "location": "tests/assert-visible.spec.ts:8",
+      "status": "failed",
+      "apiName": "expect.toBeVisible",
+      "errorMessage": "Error: expect(locator).toBeVisible() failed\n\nLocator: getByRole(\"button\", { name: \"Submit\" })\nExpected: visible\nReceived: hidden"
+    },
+    {
+      "title": "orders api",
+      "location": "tests/assert-timeout.spec.ts:21",
+      "status": "timedOut",
+      "apiName": "page.waitForResponse",
+      "errorMessage": "TimeoutError: page.waitForResponse: Timeout 30000ms exceeded while waiting for /api/orders"
+    }
+  ]
+}
