@@ -231,6 +231,28 @@ test("loadHistory drops unusable runs and treats corrupt JSON as no history", ()
   assert.deepEqual(loadHistory(corrupt), emptyHistory());
 });
 
+test("loadHistory drops malformed cluster entries so stats stay finite", () => {
+  const path = join(mkdtempSync(join(tmpdir(), "latch-badclusters-")), "store.json");
+  writeFileSync(
+    path,
+    JSON.stringify({
+      version: 1,
+      runs: [
+        {
+          at: "2026-09-01T00:00:00.000Z",
+          total_failed: 3,
+          clusters: [1, null, { signature: "a|x", size: 1, failed_count: 1, flaky_count: 0, action: "needs_human" }],
+        },
+      ],
+    }),
+  );
+  const history = loadHistory(path);
+  assert.equal(history.runs[0]?.clusters.length, 1);
+  const stats = historyStats(history);
+  assert.equal(stats.get("a|x")?.failed_total, 1);
+  assert.ok(Number.isFinite(stats.get("a|x")?.flaky_total));
+});
+
 test("buildRecord captures the scored clusters and labelsFor maps signatures", () => {
   const record = buildRecord([cluster({ cause: "env_cascade" })], 4, "at", "ci-7");
   assert.equal(record.label, "ci-7");

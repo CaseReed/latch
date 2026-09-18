@@ -66,7 +66,11 @@ export function emptyHistory(): History {
 }
 
 function usableRun(run: unknown): run is RunRecord {
-  return Boolean(run) && typeof run === "object" && Array.isArray((run as RunRecord).clusters);
+  return isRecord(run) && Array.isArray((run as { clusters?: unknown }).clusters);
+}
+
+function usableCluster(cluster: unknown): cluster is RunClusterRecord {
+  return isRecord(cluster) && typeof cluster.signature === "string";
 }
 
 /** Read the store; a missing or unreadable file is treated as no history. */
@@ -82,7 +86,11 @@ export function loadHistory(path: string): History {
     }
     return {
       version: 1,
-      runs: Array.isArray(parsed.runs) ? parsed.runs.filter(usableRun) : [],
+      runs: Array.isArray(parsed.runs)
+        ? parsed.runs
+            .filter(usableRun)
+            .map((run) => ({ ...run, clusters: run.clusters.filter(usableCluster) }))
+        : [],
       suppressed: Array.isArray(parsed.suppressed)
         ? parsed.suppressed.filter((entry): entry is string => typeof entry === "string")
         : [],

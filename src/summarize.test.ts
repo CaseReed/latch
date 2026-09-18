@@ -77,3 +77,16 @@ test("a reused judgment is marked cached in the terminal and the markdown", () =
     /- cached: true/,
   );
 });
+
+test("cached clusters are not counted as Jev calls in the footer", () => {
+  const cached: ScoredCluster = {
+    ...cluster,
+    cached: true,
+    usage: undefined,
+    latency_ms: undefined,
+    cost_estimate_usd: undefined,
+  };
+  const md = formatMarkdown([cached], 5, { workers: 1, retries_config: 0 });
+  assert.match(md, /Jev: 0 calls · 1 cached/);
+  assert.doesNotMatch(md, /Jev: 1 call\b/);
+});

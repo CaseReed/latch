@@ -99,19 +99,23 @@ export function formatMarkdown(
     lines.push("");
   }
 
-  const called = scored.filter((cluster) => cluster.scored);
-  if (called.length > 0) {
-    const usage = called.reduce(
+  const answered = scored.filter((cluster) => cluster.scored);
+  const fresh = answered.filter((cluster) => !cluster.cached);
+  if (answered.length > 0) {
+    const usage = fresh.reduce(
       (total, cluster) => ({
         input: total.input + (cluster.usage?.input_tokens ?? 0),
         output: total.output + (cluster.usage?.output_tokens ?? 0),
       }),
       { input: 0, output: 0 },
     );
-    const latency = called.reduce((total, cluster) => total + (cluster.latency_ms ?? 0), 0);
-    const cost = called.reduce((total, cluster) => total + (cluster.cost_estimate_usd ?? 0), 0);
-    const models = [...new Set(called.map((cluster) => cluster.model).filter(Boolean))];
-    lines.push(`Jev: ${called.length} call${called.length === 1 ? "" : "s"} · ${models.join(", ")}`);
+    const latency = fresh.reduce((total, cluster) => total + (cluster.latency_ms ?? 0), 0);
+    const cost = fresh.reduce((total, cluster) => total + (cluster.cost_estimate_usd ?? 0), 0);
+    const models = [...new Set(answered.map((cluster) => cluster.model).filter(Boolean))];
+    const cached = answered.length - fresh.length;
+    lines.push(
+      `Jev: ${fresh.length} call${fresh.length === 1 ? "" : "s"}${cached > 0 ? ` · ${cached} cached` : ""}${models.length > 0 ? ` · ${models.join(", ")}` : ""}`,
+    );
     lines.push(
       `tokens in/out: ${usage.input}/${usage.output} · latency: ${latency}ms · est. cost: $${cost.toFixed(4)}`,
     );
