@@ -1,8 +1,10 @@
 # Latch
 
-Jev judges the failed RUN. Playwright already executed. Code clusters and reports.
+Merge-gate triage for a red test run. Playwright already executed; Latch answers the only question that matters before merging: **is this red an infra outage I can ignore, or a real failure I must look at?**
 
 **Latch does not modify your tests.** Read-only reporter: cluster first, then one TypeSafe Jev `systemOne` per cluster (max 8, 3 in flight). No remap, no click, no wrapper `test()`. Code owns the final `action`; Jev's own `action` answer only corroborates the product branch.
+
+**Good at**: collapsing an infra cascade (70 identical connection errors → 1 cause) and refusing to silently ignore a non-infra failure. **Not good at**: grouping a logic regression whose many tests fail with different assertion messages — those fragment into separate clusters (see [Limits](#limits) and `experiments/click-real`).
 
 ## Install
 
@@ -25,14 +27,14 @@ P2 assertion_bug n=1 conf=1.00 same_root=0.75 blocks=0.48  action=fix_product (a
 P3 expect.toBeVisible n=1 conf=0.47  action=needs_human (low_confidence)
 ```
 
-70 connection-refused at the same `localhost:8080` are **one** infra cluster, not 70 traces. Green run: `Latch: 0 failures` (no Jev).
+70 connection-refused at the same `localhost:8080` are **one** infra cluster, not 70 traces. That is the infra-cascade case: the messages are identical. Green run: `Latch: 0 failures` (no Jev).
 
 Also: `traces/latch-report.json`, `traces/latch.md` (with a Jev calls / tokens / latency / estimated-cost footer). `GITHUB_STEP_SUMMARY` and the PR comment are optional; the comment is updated in place (marker `<!-- latch-report -->`), never duplicated.
 
 ## Proof
 
 ```bash
-npm run test:unit          # 60 tests, goldens + hooks, no network
+npm run test:unit          # 76 tests, goldens + hooks, no network
 npm run print:clusters     # 73 failed → 4 causes, n=70
 npm run test:e2e           # real Playwright, intentional failures, no key needed
 npm run test:stability     # signature stability over repeated runs (browser, ~30s)
@@ -99,6 +101,7 @@ Thresholds are calibrated against observed Jev output (`blocks_merge` sits ~0.45
 ## Limits
 
 - Signature = `apiName` + first 80 chars of the normalized error. Normalization strips ANSI, UUIDs, long hex/id tokens, ISO timestamps, durations and pixel diffs; ports stay because they are part of a service's identity. Errors that only differ past char 80 collapse into one cluster.
+- **Grouping is message-based, so a logic regression fragments.** Measured on `pallets/click`: 2 real regressions → 13 failures, reported as 10 causes, because each test emits a different assertion message. The `73 → 4` headline is an infra-cascade property, not a general one. pytest's default JUnit carries no file frames, so there is no cheap location-based fix. See `experiments/click-real`.
 - `npm run test:stability` runs real volatile failures repeatedly and fails on unexpected drift (currently 7/8 fixtures stable; the random-port case is documented as known drift).
 - The Jev state is redacted (Bearer / `sk-` `ts_` shaped keys / `password|token|secret|api_key=` assignments) before it leaves the machine. Signatures are still computed on the raw message. Test data is otherwise sent to TypeSafe as-is.
 - At most 8 Jev calls; remaining clusters are `unscored`.

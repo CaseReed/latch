@@ -3,6 +3,7 @@ node_modules/
 traces/
 .latch/
 experiments/real-pytest/results.xml
+experiments/click-real/results.xml
 test-results/
 playwright-report/
 blob-report/
