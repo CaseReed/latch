@@ -1,5 +1,6 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { isBlocking } from "./policy.ts";
 import type { Cluster, RunMeta, ScoredCluster } from "./types.ts";
 
 export function formatClusterLine(cluster: Cluster, index: number): string {
@@ -45,6 +46,12 @@ export function formatScoredTerminal(
     const head = cluster.representative_error.replace(/\s+/g, " ").slice(0, 72);
     lines.push(`     ${head}`);
   }
+  const blocking = scored.filter((cluster) => isBlocking(cluster.action)).length;
+  lines.push(
+    blocking === 0
+      ? "Gate: PASS (no blocking cluster)"
+      : `Gate: BLOCK — ${blocking} cluster${blocking === 1 ? "" : "s"} to look at`,
+  );
   return lines.join("\n");
 }
 
@@ -63,6 +70,15 @@ export function formatMarkdown(
     `${failed} failed → ${causes}${hidden} · workers=${meta.workers} retries=${meta.retries_config}`,
     ``,
   ];
+  const blocking = scored.filter((cluster) => isBlocking(cluster.action)).length;
+  if (scored.length > 0) {
+    lines.push(
+      blocking === 0
+        ? `**Gate: PASS** — nothing blocking.`
+        : `**Gate: BLOCK** — ${blocking} cluster${blocking === 1 ? "" : "s"} to look at.`,
+    );
+    lines.push("");
+  }
   if (scored.length === 0) {
     lines.push("No failure clusters.");
     return lines.join("\n");

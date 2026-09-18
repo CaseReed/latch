@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { decideAction, isInfraError, type PolicyInput } from "./policy.ts";
+import { decideAction, isBlocking, isInfraError, type PolicyInput } from "./policy.ts";
 
 function base(overrides: Partial<PolicyInput> = {}): PolicyInput {
   return {
@@ -51,6 +51,13 @@ test("env_cascade without an infra fingerprint needs a human, never a silent ign
     ),
     { action: "needs_human", reason: "env_cascade_unconfirmed" },
   );
+});
+
+test("isBlocking only clears confirmed infra noise", () => {
+  assert.equal(isBlocking("ignore_as_infra"), false);
+  assert.equal(isBlocking("fix_product"), true);
+  assert.equal(isBlocking("fix_test"), true);
+  assert.equal(isBlocking("needs_human"), true);
 });
 
 test("isInfraError recognizes network outages but not local failures", () => {

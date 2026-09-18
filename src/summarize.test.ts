@@ -78,6 +78,20 @@ test("a reused judgment is marked cached in the terminal and the markdown", () =
   );
 });
 
+test("the gate blocks on a non-infra cluster and passes on infra noise", () => {
+  assert.match(formatScoredTerminal([cluster], 5), /Gate: BLOCK/);
+  const infra: ScoredCluster = { ...cluster, action: "ignore_as_infra" };
+  assert.match(formatScoredTerminal([infra], 5), /Gate: PASS/);
+  assert.match(
+    formatMarkdown([infra], 5, { workers: 1, retries_config: 0 }),
+    /\*\*Gate: PASS\*\*/,
+  );
+  assert.match(
+    formatMarkdown([cluster], 5, { workers: 1, retries_config: 0 }),
+    /\*\*Gate: BLOCK\*\*/,
+  );
+});
+
 test("cached clusters are not counted as Jev calls in the footer", () => {
   const cached: ScoredCluster = {
     ...cluster,

@@ -26,6 +26,11 @@ export function isInfraError(message: string): boolean {
   return INFRA_PATTERNS.some((pattern) => pattern.test(message));
 }
 
+/** A cluster blocks a merge unless it is confirmed infra noise. */
+export function isBlocking(action: string): boolean {
+  return action !== "ignore_as_infra";
+}
+
 export type PolicyInput = {
   cause?: string;
   cause_confidence?: number;

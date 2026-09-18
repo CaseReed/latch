@@ -13,33 +13,39 @@ import {
   unsuppress,
 } from "./ledger.ts";
 import "./load-env.ts";
+import { isBlocking } from "./policy.ts";
 import { MAX_JEV_CLUSTERS, scoreClusters } from "./score-run.ts";
 import { formatScoredTerminal } from "./summarize.ts";
 import type { FailedAttempt, RunMeta } from "./types.ts";
 
 const USAGE = [
   "usage:",
-  "  latch <junit.xml | golden.json> [--store <path>]   cluster and label a run",
+  "  latch <junit.xml | golden.json> [--store <path>] [--gate]   cluster and label a run",
   "  latch suppress <signature> [--store <path>]        mark a cluster as known noise (* wildcard)",
   "  latch unsuppress <signature> [--store <path>]      remove a suppression",
   "  latch suppressions [--store <path>]                list suppressions",
+  "",
+  "  --gate exits non-zero when a non-infra cluster would block a merge.",
 ].join("\n");
 
 type GoldenLike = { run?: RunMeta; attempts?: FailedAttempt[] };
 
-function parseArgs(argv: string[]): { tokens: string[]; store: string } {
+function parseArgs(argv: string[]): { tokens: string[]; store: string; gate: boolean } {
   const tokens: string[] = [];
   let store = storePath();
+  let gate = false;
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i]!;
     if (arg === "--store") {
       store = argv[i + 1] ?? store;
       i += 1;
+    } else if (arg === "--gate") {
+      gate = true;
     } else if (!arg.startsWith("--")) {
       tokens.push(arg);
     }
   }
-  return { tokens, store };
+  return { tokens, store, gate };
 }
 
 function readInput(path: string): { run: RunMeta; attempts: FailedAttempt[] } {
@@ -54,7 +60,7 @@ function readInput(path: string): { run: RunMeta; attempts: FailedAttempt[] } {
   return { run: data.run ?? { workers: 1, retries_config: 0 }, attempts: data.attempts };
 }
 
-async function analyze(path: string, store: string): Promise<void> {
+async function analyze(path: string, store: string, gate: boolean): Promise<void> {
   const { run, attempts } = readInput(path);
   const clusters = clusterAttempts(attempts);
   const history = store ? loadHistory(store) : undefined;
@@ -63,10 +69,15 @@ async function analyze(path: string, store: string): Promise<void> {
   const { annotations, active, suppressed } = presentRun(scored, history);
   console.log(formatScoredTerminal(active, attempts.length, annotations, suppressed.length));
   persistRun(store, history, scored, attempts.length, cache);
+
+  const blocking = active.filter((cluster) => isBlocking(cluster.action)).length;
+  if (gate && blocking > 0) {
+    process.exitCode = 1;
+  }
 }
 
 async function main(): Promise<void> {
-  const { tokens, store } = parseArgs(process.argv.slice(2));
+  const { tokens, store, gate } = parseArgs(process.argv.slice(2));
   const [command, argument] = tokens;
 
   if (!command || command === "help") {
@@ -90,7 +101,7 @@ async function main(): Promise<void> {
     return;
   }
 
-  await analyze(command, store);
+  await analyze(command, store, gate);
 }
 
 try {

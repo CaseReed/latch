@@ -31,6 +31,23 @@ P3 expect.toBeVisible n=1 conf=0.47  action=needs_human (low_confidence)
 
 Also: `traces/latch-report.json`, `traces/latch.md` (with a Jev calls / tokens / latency / estimated-cost footer). `GITHUB_STEP_SUMMARY` and the PR comment are optional; the comment is updated in place (marker `<!-- latch-report -->`), never duplicated.
 
+## Merge gate
+
+`npm run latch -- <file> --gate` exits non-zero when at least one reported cluster is **not confirmed infra noise**. `ignore_as_infra` and suppressed clusters pass; `fix_product`, `fix_test` and `needs_human` block.
+
+```
+# 8 identical connection errors, live Jev
+Latch: 8 failed → 1 cause
+P0 env_cascade n=8 conf=1.00 same_root=0.88 blocks=0.44  action=ignore_as_infra (env_cascade)
+Gate: PASS (no blocking cluster)                       # exit 0
+
+# 2 real regressions in pallets/click (experiments/click-real)
+Latch: 13 failed → 10 causes
+Gate: BLOCK — 10 clusters to look at                   # exit 1
+```
+
+The reporter itself never fails Playwright by design; the gate exit code belongs to the CLI, so CI runs it as its own step and keeps the Playwright result untouched.
+
 ## Proof
 
 ```bash
