@@ -15,6 +15,13 @@ for (let run = 0; run < RUNS; run += 1) {
     stdio: "ignore",
     env: { ...process.env, LATCH_STORE: "", TYPESAFE_API_KEY: "" },
   });
+  if (result.error || result.status === null) {
+    console.error(
+      `could not run the stability fixtures: ${result.error?.message ?? "no exit status"}`,
+    );
+    process.exitCode = 1;
+    break;
+  }
   if (result.status === 0) {
     console.error("stability fixtures passed; they must fail to be measured");
     process.exitCode = 1;

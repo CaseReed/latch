@@ -29,3 +29,6 @@ jobs:
 
       # Offline demonstration of the merge gate: infra -> PASS, regression -> BLOCK.
       - run: npm run demo
+
+      # Signature stability over repeated runs (no key needed).
+      - run: npm run test:stability

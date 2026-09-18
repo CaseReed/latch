@@ -6,6 +6,7 @@ const run = spawnSync("npx", ["playwright", "test", "tests/reporter.e2e.spec.ts"
   stdio: "inherit",
   env: { ...process.env, TYPESAFE_API_KEY: "" },
 });
+assert.equal(run.error, undefined, `could not start playwright: ${run.error?.message ?? ""}`);
 assert.notEqual(run.status, 0, "the e2e fixtures must fail, else there is nothing to report");
 
 const report = JSON.parse(readFileSync("traces/latch-report.json", "utf8")) as {
