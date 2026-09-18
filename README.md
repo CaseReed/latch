@@ -59,21 +59,26 @@ Measured on `testdata/junit/` (live Jev):
 
 The limit is the point: clustering generalizes when the runner exposes a stable `message`/`type`, and falls back to one-cluster-per-test when the raw output is all you have. `go.xml` is the canary.
 
-## Failure ledger (history across runs)
+## Failure ledger (history, suppression, flake)
 
-Every run — reporter or CLI — appends its clusters to a local store (`.latch/store.json`, override with `LATCH_STORE`, set it empty to disable). The next run labels each cluster in the terminal and in the markdown:
+Every run — reporter or CLI — appends its clusters to a local store (`.latch/store.json`, override with `LATCH_STORE`, set it empty to disable) and labels each cluster from prior runs:
 
 ```
 P0 env_cascade n=4 conf=1.00 same_root=0.83 blocks=0.52  action=ignore_as_infra (env_cascade)  [seen x2]
 P1 assertion_bug n=1 conf=0.98 same_root=0.60 blocks=0.51  action=fix_product (assertion_bug)  [new]
+P2 locator.waitFor n=8 conf=0.94  action=fix_test (flake)  [seen x5, flake 40%]
 ```
+
+`[seen xN]` is recurrence, `flake P%` is the share of those runs where the cluster had a flaky attempt. Known noise can be suppressed so the merge gate trusts what remains:
 
 ```bash
-npm run latch -- testdata/runs/env-cascade.json --store /tmp/latch-store.json
-# first run: [new] ... second run: [seen x1]
+npm run latch -- testdata/runs/env-cascade.json --store /tmp/s.json
+npm run latch -- suppress 'page.goto|*' --store /tmp/s.json      # `*` wildcard; unsuppress / suppressions also exist
+npm run latch -- testdata/runs/env-cascade.json --store /tmp/s.json
+# Latch: 73 failed → 3 causes (1 suppressed)
 ```
 
-A recurring infra cluster now reads differently from a fresh product failure — the raw material for a flake budget or a trusted merge gate. The store keeps the last 100 runs; in CI it must be cached or committed to persist.
+Suppressed clusters are hidden from the report but still counted in history. The store keeps the last 100 runs; in CI it must be cached or committed to persist.
 
 ## Policy (code)
 

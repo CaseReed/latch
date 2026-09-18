@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtempSync } from "node:fs";
+import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
@@ -9,9 +9,13 @@ import {
   emptyHistory,
   historyLabel,
   historyStats,
+  isSuppressed,
   labelsFor,
   loadHistory,
   saveHistory,
+  splitSuppressed,
+  suppress,
+  unsuppress,
   type RunRecord,
 } from "./ledger.ts";
 import type { ScoredCluster } from "./types.ts";
@@ -74,10 +78,12 @@ test("historyStats aggregates seen, failed and flaky totals per signature", () =
         ["b|y", 3, 0],
       ]),
     ],
+    suppressed: [],
   };
   const stats = historyStats(history);
   assert.deepEqual(stats.get("a|x"), {
     seen: 2,
+    flaky_runs: 1,
     first_seen: "2026-09-01T00:00:00.000Z",
     last_seen: "2026-09-02T00:00:00.000Z",
     flaky_total: 1,
@@ -86,7 +92,7 @@ test("historyStats aggregates seen, failed and flaky totals per signature", () =
   assert.equal(stats.get("b|y")?.seen, 1);
 });
 
-test("historyLabel marks unseen clusters new and reports flake", () => {
+test("historyLabel marks unseen clusters new and reports the flake rate", () => {
   assert.equal(historyLabel(undefined), "[new]");
   const stats = historyStats({
     version: 1,
@@ -94,8 +100,42 @@ test("historyLabel marks unseen clusters new and reports flake", () => {
       run("2026-09-01T00:00:00.000Z", [["a|x", 1, 0]]),
       run("2026-09-02T00:00:00.000Z", [["a|x", 1, 2]]),
     ],
+    suppressed: [],
   });
-  assert.equal(historyLabel(stats.get("a|x")), "[seen x2, flaky 2]");
+  assert.equal(historyLabel(stats.get("a|x")), "[seen x2, flake 50%]");
+});
+
+test("isSuppressed matches exactly and with a wildcard", () => {
+  const history = suppress(suppress(emptyHistory(), "page.goto|exact"), "locator.click|*");
+  assert.equal(isSuppressed(history, "page.goto|exact"), true);
+  assert.equal(isSuppressed(history, "page.goto|other"), false);
+  assert.equal(isSuppressed(history, "locator.click|anything at all"), true);
+  assert.equal(isSuppressed(history, "locator.fill|x"), false);
+});
+
+test("suppress dedupes and sorts, unsuppress removes", () => {
+  const history = suppress(suppress(suppress(emptyHistory(), "b|x"), "a|x"), "b|x");
+  assert.deepEqual(history.suppressed, ["a|x", "b|x"]);
+  assert.deepEqual(unsuppress(history, "a|x").suppressed, ["b|x"]);
+});
+
+test("splitSuppressed separates known noise from reported clusters", () => {
+  const history = suppress(emptyHistory(), "noise|*");
+  const { active, suppressed } = splitSuppressed(
+    [cluster({ signature: "noise|a" }), cluster({ signature: "real|b" })],
+    history,
+  );
+  assert.deepEqual(active.map((c) => c.signature), ["real|b"]);
+  assert.deepEqual(suppressed.map((c) => c.signature), ["noise|a"]);
+});
+
+test("a legacy store without suppressions loads with an empty list", () => {
+  const path = join(mkdtempSync(join(tmpdir(), "latch-legacy-")), "store.json");
+  saveHistory({ version: 1, runs: [], suppressed: [] }, path);
+  const raw = JSON.parse(readFileSync(path, "utf8")) as { suppressed?: string[] };
+  delete raw.suppressed;
+  writeFileSync(path, JSON.stringify(raw));
+  assert.deepEqual(loadHistory(path).suppressed, []);
 });
 
 test("buildRecord captures the scored clusters and labelsFor maps signatures", () => {

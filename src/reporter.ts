@@ -15,6 +15,7 @@ import {
   labelsFor,
   loadHistory,
   saveHistory,
+  splitSuppressed,
   storePath,
 } from "./ledger.ts";
 import { toFailedAttempt } from "./playwright-attempt.ts";
@@ -74,15 +75,23 @@ export default class LatchReporter implements Reporter {
       const history = loadHistory(store);
       const scored = await scoreClusters(clusters, this.meta);
       const annotations = labelsFor(scored, history);
-      const text = formatScoredTerminal(scored, this.attempts.length, annotations);
+      const { active, suppressed } = splitSuppressed(scored, history);
+      const text = formatScoredTerminal(active, this.attempts.length, annotations, suppressed.length);
       console.log(text);
-      const markdown = formatMarkdown(scored, this.attempts.length, this.meta, annotations);
+      const markdown = formatMarkdown(
+        active,
+        this.attempts.length,
+        this.meta,
+        annotations,
+        suppressed.length,
+      );
       writeReports(
         "traces",
         {
           run: this.meta,
           failed: this.attempts.length,
           clusters: scored,
+          suppressed: suppressed.map((cluster) => cluster.signature),
         },
         markdown,
       );

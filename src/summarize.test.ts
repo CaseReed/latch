@@ -53,10 +53,18 @@ test("unscored clusters render their reason so no_key is visible", () => {
 });
 
 test("history annotations reach the terminal and the markdown", () => {
-  const annotations = new Map([[cluster.signature, "[seen x3, flaky 1]"]]);
-  assert.match(formatScoredTerminal([cluster], 5, annotations), /\[seen x3, flaky 1\]/);
+  const annotations = new Map([[cluster.signature, "[seen x3, flake 25%]"]]);
+  assert.match(formatScoredTerminal([cluster], 5, annotations), /\[seen x3, flake 25%\]/);
   assert.match(
     formatMarkdown([cluster], 5, { workers: 1, retries_config: 0 }, annotations),
-    /- history: \[seen x3, flaky 1\]/,
+    /- history: \[seen x3, flake 25%\]/,
+  );
+});
+
+test("suppressed clusters are counted in the header but not listed", () => {
+  assert.match(formatScoredTerminal([cluster], 5, undefined, 2), /Latch: 5 failed → 1 cause \(2 suppressed\)/);
+  assert.match(
+    formatMarkdown([cluster], 5, { workers: 1, retries_config: 0 }, undefined, 2),
+    /\(2 suppressed\)/,
   );
 });

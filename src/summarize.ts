@@ -20,11 +20,12 @@ export function formatScoredTerminal(
   scored: ScoredCluster[],
   failed: number,
   annotations?: Map<string, string>,
+  suppressed = 0,
 ): string {
-  if (failed === 0 && scored.length === 0) return "Latch: 0 failures";
-  const lines = [
-    `Latch: ${failed} failed → ${scored.length} cause${scored.length === 1 ? "" : "s"}`,
-  ];
+  if (failed === 0 && scored.length === 0 && suppressed === 0) return "Latch: 0 failures";
+  const causes = `${scored.length} cause${scored.length === 1 ? "" : "s"}`;
+  const hidden = suppressed > 0 ? ` (${suppressed} suppressed)` : "";
+  const lines = [`Latch: ${failed} failed → ${causes}${hidden}`];
   for (const [i, cluster] of scored.entries()) {
     const cause = cluster.cause ?? "unscored";
     const conf =
@@ -51,11 +52,14 @@ export function formatMarkdown(
   failed: number,
   meta: RunMeta,
   annotations?: Map<string, string>,
+  suppressed = 0,
 ): string {
+  const causes = `${scored.length} cause${scored.length === 1 ? "" : "s"}`;
+  const hidden = suppressed > 0 ? ` (${suppressed} suppressed)` : "";
   const lines = [
     `# Latch`,
     ``,
-    `${failed} failed → ${scored.length} cause${scored.length === 1 ? "" : "s"} · workers=${meta.workers} retries=${meta.retries_config}`,
+    `${failed} failed → ${causes}${hidden} · workers=${meta.workers} retries=${meta.retries_config}`,
     ``,
   ];
   if (scored.length === 0) {
