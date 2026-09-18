@@ -1,11 +1,20 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
+import { signatureOf } from "../attempt.ts";
 import { clusterAttempts } from "../cluster.ts";
 import { ingestJUnit } from "./junit.ts";
 
 function load(name: string) {
   return ingestJUnit(readFileSync(`testdata/junit/${name}`, "utf8"));
+}
+
+function escapeAttr(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
 }
 
 test("jest JUnit: stable message collapses infra failures, expect failures get an api name", () => {
@@ -57,4 +66,37 @@ test("a failure without a message attribute falls back to its text", () => {
   assert.equal(attempts.length, 1);
   assert.equal(attempts[0]?.apiName, "page.goto");
   assert.match(attempts[0]?.errorMessage ?? "", /ERR_CONNECTION_REFUSED/);
+});
+
+test("numeric character references are decoded", () => {
+  const { attempts } = ingestJUnit(
+    '<testsuite name="x" tests="1"><testcase name="a"><failure message="assert 1 == 2&#10; + where 1 = f()">trace</failure></testcase></testsuite>',
+  );
+  assert.equal(attempts[0]?.errorMessage, "assert 1 == 2\n + where 1 = f()");
+  assert.doesNotMatch(attempts[0]?.errorMessage ?? "", /&#10;/);
+});
+
+test("a short message is preferred over the traceback, so the test name cannot leak", () => {
+  const xml = (name: string) =>
+    `<testsuite name="x" tests="1"><testcase name="${name}"><failure message="TimeoutError: timed out">def ${name}(): ...</failure></testcase></testsuite>`;
+  const a = ingestJUnit(xml("test_a")).attempts[0]!;
+  const b = ingestJUnit(xml("test_b")).attempts[0]!;
+  assert.equal(a.errorMessage, "TimeoutError: timed out");
+  assert.equal(a.apiName, "TimeoutError");
+  assert.equal(signatureOf(a), signatureOf(b));
+});
+
+test("the exception name is read from the message when pytest emits no type", () => {
+  const cases: Array<[string, string]> = [
+    ["urllib.error.URLError: <urlopen error [Errno 61] Connection refused>", "URLError"],
+    ["json.decoder.JSONDecodeError: Expecting value: line 1 column 13", "JSONDecodeError"],
+    ["KeyError: 'error_rate'", "KeyError"],
+    ["ZeroDivisionError: division by zero", "ZeroDivisionError"],
+  ];
+  for (const [message, expected] of cases) {
+    const { attempts } = ingestJUnit(
+      `<testsuite name="x" tests="1"><testcase name="a"><failure message="${escapeAttr(message)}">tb</failure></testcase></testsuite>`,
+    );
+    assert.equal(attempts[0]?.apiName, expected, message);
+  }
 });

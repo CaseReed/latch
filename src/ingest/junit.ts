@@ -20,6 +20,21 @@ function asRecord(value: unknown): Node {
   return value && typeof value === "object" && !Array.isArray(value) ? (value as Node) : {};
 }
 
+const NUMERIC_ENTITY = /&#(x?)([0-9a-fA-F]+);/g;
+
+/** fast-xml-parser decodes named entities but leaves numeric character references. */
+function decodeNumericEntities(text: string): string {
+  return text.replace(NUMERIC_ENTITY, (whole, hex: string, code: string) => {
+    const value = Number.parseInt(code, hex ? 16 : 10);
+    if (!Number.isFinite(value) || value < 0 || value > 0x10ffff) return whole;
+    try {
+      return String.fromCodePoint(value);
+    } catch {
+      return whole;
+    }
+  });
+}
+
 function asArray(value: unknown): unknown[] {
   if (value === undefined || value === null) return [];
   return Array.isArray(value) ? value : [value];
@@ -27,7 +42,7 @@ function asArray(value: unknown): unknown[] {
 
 function attr(node: Node, name: string): string | undefined {
   const value = node[`@_${name}`];
-  if (typeof value === "string") return value;
+  if (typeof value === "string") return decodeNumericEntities(value);
   if (typeof value === "number") return String(value);
   return undefined;
 }
@@ -40,10 +55,10 @@ function numberAttr(node: Node, name: string): number | undefined {
 }
 
 function textOf(value: unknown): string {
-  if (typeof value === "string") return value;
+  if (typeof value === "string") return decodeNumericEntities(value);
   if (typeof value === "number") return String(value);
   const text = asRecord(value)["#text"];
-  return typeof text === "string" ? text : "";
+  return typeof text === "string" ? decodeNumericEntities(text) : "";
 }
 
 /** Keep the class name of a JUnit `type`, dropping module paths. */
@@ -51,10 +66,24 @@ function normalizeType(type: string): string {
   return type.split(/[./\\]/).filter(Boolean).pop() ?? type;
 }
 
+/**
+ * When the framework gives no `type` and the message matches no known API, read
+ * the exception name from the message itself (pytest 9 emits no `type`).
+ */
+function apiNameFromMessage(message: string): string | undefined {
+  const head = message.trim();
+  if (/^assert\b/.test(head)) return "AssertionError";
+  const named = head.match(/^([A-Za-z_][\w.]*(?:Error|Exception|Warning|Failure))\b/);
+  if (named) return normalizeType(named[1]!);
+  const dotted = head.match(/^([A-Za-z_]\w*\.[A-Za-z_][\w.]*)\s*:/);
+  return dotted ? normalizeType(dotted[1]!) : undefined;
+}
+
 function apiNameOf(message: string, type?: string): string {
   const derived = deriveApiName(message);
   if (derived !== "unknown") return derived;
-  return type ? normalizeType(type) : "unknown";
+  if (type) return normalizeType(type);
+  return apiNameFromMessage(message) ?? "unknown";
 }
 
 function failureElement(node: Node): unknown | undefined {
@@ -62,13 +91,15 @@ function failureElement(node: Node): unknown | undefined {
   return found === undefined ? undefined : found;
 }
 
+/**
+ * Prefer the framework's `message` over the raw traceback: the traceback embeds
+ * the test name and the source line, which would leak into the signature and
+ * split one cause into one cluster per test.
+ */
 function messageOf(element: unknown): string {
-  const node = asRecord(element);
-  const message = attr(node, "message")?.trim();
-  const text = textOf(element).trim();
-  if (!message) return text;
-  if (!text || text === message || text.startsWith(message)) return text || message;
-  return `${message}\n${text}`;
+  const message = attr(asRecord(element), "message");
+  const text = textOf(element);
+  return (message ?? text).trim();
 }
 
 function locationOf(node: Node, name: string): string {

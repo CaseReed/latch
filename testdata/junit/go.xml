@@ -2,15 +2,15 @@
 <testsuites>
   <testsuite name="github.com/acme/app" tests="3" failures="3" time="9.0">
     <testcase classname="github.com/acme/app" name="TestLogin" time="3.0">
-      <failure message="timeout waiting for response after 3000ms">--- FAIL: TestLogin (3.00s)
+      <failure>--- FAIL: TestLogin (3.00s)
     login_test.go:42: timeout waiting for response after 3000ms</failure>
     </testcase>
     <testcase classname="github.com/acme/app" name="TestLogout" time="3.0">
-      <failure message="timeout waiting for response after 3000ms">--- FAIL: TestLogout (3.00s)
+      <failure>--- FAIL: TestLogout (3.00s)
     session_test.go:88: timeout waiting for response after 3000ms</failure>
     </testcase>
     <testcase classname="github.com/acme/app" name="TestRefresh" time="3.0">
-      <failure message="timeout waiting for response after 3000ms">--- FAIL: TestRefresh (3.00s)
+      <failure>--- FAIL: TestRefresh (3.00s)
     session_test.go:104: timeout waiting for response after 3000ms</failure>
     </testcase>
   </testsuite>
