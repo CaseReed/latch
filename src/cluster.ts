@@ -11,7 +11,12 @@ function unique(values: string[]): string[] {
 export function clusterAttempts(attempts: FailedAttempt[]): Cluster[] {
   const buckets = new Map<string, FailedAttempt[]>();
   for (const attempt of attempts) {
-    const signature = signatureOf(attempt);
+    // The signature is written to traces/, the markdown and the PR comment, so
+    // it is computed on the redacted message, like every other output.
+    const signature = signatureOf({
+      apiName: attempt.apiName,
+      errorMessage: redactSecrets(attempt.errorMessage),
+    });
     const list = buckets.get(signature);
     if (list) list.push(attempt);
     else buckets.set(signature, [attempt]);

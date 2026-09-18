@@ -49,7 +49,10 @@ export async function maybeCommentOnPullRequest(markdown: string): Promise<void>
     const base = `https://api.github.com/repos/${repo}/issues/${pr}/comments`;
     const body = `${COMMENT_MARKER}\n${markdown}`.slice(0, 60_000);
 
-    const listRes = await fetch(`${base}?per_page=100`, { headers });
+    const listRes = await fetch(`${base}?per_page=100`, {
+      headers,
+      signal: AbortSignal.timeout(10_000),
+    });
     if (!listRes.ok) {
       console.error(`[latch] GitHub comment list failed: ${listRes.status}`);
       return;
@@ -58,8 +61,18 @@ export async function maybeCommentOnPullRequest(markdown: string): Promise<void>
     const existing = comments.find((comment) => comment.body?.includes(COMMENT_MARKER));
 
     const writeRes = existing
-      ? await fetch(`${base}/${existing.id}`, { method: "PATCH", headers, body: JSON.stringify({ body }) })
-      : await fetch(base, { method: "POST", headers, body: JSON.stringify({ body }) });
+      ? await fetch(`${base}/${existing.id}`, {
+          method: "PATCH",
+          headers,
+          body: JSON.stringify({ body }),
+          signal: AbortSignal.timeout(10_000),
+        })
+      : await fetch(base, {
+          method: "POST",
+          headers,
+          body: JSON.stringify({ body }),
+          signal: AbortSignal.timeout(10_000),
+        });
     if (!writeRes.ok) {
       console.error(`[latch] GitHub comment failed: ${writeRes.status}`);
     }

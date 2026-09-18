@@ -69,4 +69,9 @@ test("secrets in error text are redacted before they reach any report", () => {
   assert.doesNotMatch(error, /sk_abc123456/);
   assert.match(error, /Bearer <redacted>/);
   assert.match(error, /<redacted-key>/);
+
+  // The signature is written to traces/ and the PR comment, so it is covered too.
+  const signature = clusters[0]?.signature ?? "";
+  assert.doesNotMatch(signature, /abc123def456/);
+  assert.doesNotMatch(signature, /sk_abc123456/);
 });
