@@ -33,6 +33,35 @@ test("planScoring reuses the cache, then spends the fresh budget, then skips", (
   );
 });
 
+test("planScoring with a zero budget only answers cached clusters", () => {
+  const cache = new Map<string, CachedJudgment>([["a|1", { cause: "flake" }]]);
+  const plan = planScoring([cluster("a|1"), cluster("b|2")], cache, 0);
+  assert.deepEqual(
+    plan.map((item) => item.mode),
+    ["cached", "skip"],
+  );
+});
+
+test("a cached answer is re-evaluated by the current policy each run", async () => {
+  const cache = new Map<string, CachedJudgment>([
+    ["a|1", { cause: "flake", cause_confidence: 0.9, same_root: 0.9 }],
+  ]);
+  const withFlake = await scoreClusters(
+    [{ ...cluster("a|1"), flaky_count: 1 }],
+    { workers: 1, retries_config: 0 },
+    8,
+    cache,
+  );
+  const withoutFlake = await scoreClusters(
+    [cluster("a|1")],
+    { workers: 1, retries_config: 0 },
+    8,
+    cache,
+  );
+  assert.equal(withFlake[0]?.action, "fix_test");
+  assert.equal(withoutFlake[0]?.action, "needs_human");
+});
+
 test("a cached cluster is judged from the ledger with no API key", async () => {
   const cache = new Map<string, CachedJudgment>([
     [

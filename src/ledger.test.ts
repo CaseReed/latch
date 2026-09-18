@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdtempSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
@@ -190,6 +190,24 @@ test("judgmentCache and withJudgments round-trip and cap the store", () => {
   const merged = withJudgments(emptyHistory(), big);
   assert.equal(Object.keys(merged.judgments).length, MAX_JUDGMENTS);
   assert.ok(merged.judgments[`s|${MAX_JUDGMENTS + 9}`]);
+});
+
+test("saveHistory writes atomically and leaves no temp file", () => {
+  const dir = mkdtempSync(join(tmpdir(), "latch-atomic-"));
+  const path = join(dir, "store.json");
+  saveHistory(emptyHistory(), path);
+  assert.deepEqual(readdirSync(dir), ["store.json"]);
+  saveHistory({ ...emptyHistory(), suppressed: ["a|*"] }, path);
+  assert.equal(loadHistory(path).suppressed[0], "a|*");
+});
+
+test("persistRun stores the judgment cache next to the run", () => {
+  const path = join(mkdtempSync(join(tmpdir(), "latch-pj-")), "store.json");
+  const cache = new Map<string, CachedJudgment>([["a|1", { cause: "flake", model: "m" }]]);
+  persistRun(path, emptyHistory(), [cluster()], 1, cache);
+  const history = loadHistory(path);
+  assert.equal(history.judgments["a|1"]?.cause, "flake");
+  assert.equal(history.runs.length, 1);
 });
 
 test("loadHistory sanitizes judgments and defaults a missing map", () => {

@@ -145,18 +145,15 @@ export async function scoreClusters(
 ): Promise<ScoredCluster[]> {
   if (clusters.length === 0) return [];
 
-  if (!hasApiKey()) {
-    return clusters.map((cluster) => {
-      const cached = cache?.get(cluster.signature);
-      return cached ? scored(cluster, cached, true) : unscored(cluster, "no_key");
-    });
-  }
+  const keyed = hasApiKey();
+  // Without a key nothing can be called, so the fresh budget is zero; cached
+  // clusters are still answered from the ledger.
+  const plan = planScoring(clusters, cache, keyed ? maxJev : 0);
+  const client = keyed ? new TypeSafeClient() : undefined;
 
-  const plan = planScoring(clusters, cache, maxJev);
-  const client = new TypeSafeClient();
   return mapLimit(plan, MAX_JEV_CONCURRENCY, async (item) => {
     if (item.mode === "cached") return scored(item.cluster, item.cached!, true);
-    if (item.mode === "skip") return unscored(item.cluster, "unscored");
-    return scoreOne(client, item.cluster, run, cache);
+    if (item.mode === "fresh") return scoreOne(client!, item.cluster, run, cache);
+    return unscored(item.cluster, keyed ? "unscored" : "no_key");
   });
 }
