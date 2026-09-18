@@ -176,3 +176,30 @@ export function splitSuppressed<T extends { signature: string }>(
   }
   return { active, suppressed };
 }
+
+/**
+ * Everything a report needs from the ledger: history labels and the
+ * suppression split. `history` is undefined when the ledger is disabled.
+ */
+export function presentRun(
+  clusters: ScoredCluster[],
+  history: History | undefined,
+): {
+  annotations?: Map<string, string>;
+  active: ScoredCluster[];
+  suppressed: ScoredCluster[];
+} {
+  if (!history) return { active: clusters, suppressed: [] };
+  return { annotations: labelsFor(clusters, history), ...splitSuppressed(clusters, history) };
+}
+
+/** Append this run to the store; a falsy store path disables persistence. */
+export function persistRun(
+  store: string,
+  history: History | undefined,
+  clusters: ScoredCluster[],
+  totalFailed: number,
+): void {
+  if (!store) return;
+  saveHistory(appendRun(history ?? emptyHistory(), buildRecord(clusters, totalFailed)), store);
+}

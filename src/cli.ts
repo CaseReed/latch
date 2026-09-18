@@ -3,15 +3,13 @@ import { extname } from "node:path";
 import { clusterAttempts } from "./cluster.ts";
 import { ingestJUnit } from "./ingest/junit.ts";
 import {
-  labelsFor,
   loadHistory,
+  persistRun,
+  presentRun,
   saveHistory,
-  splitSuppressed,
   storePath,
   suppress,
   unsuppress,
-  appendRun,
-  buildRecord,
 } from "./ledger.ts";
 import "./load-env.ts";
 import { scoreClusters } from "./score-run.ts";
@@ -58,14 +56,11 @@ function readInput(path: string): { run: RunMeta; attempts: FailedAttempt[] } {
 async function analyze(path: string, store: string): Promise<void> {
   const { run, attempts } = readInput(path);
   const clusters = clusterAttempts(attempts);
-  const history = loadHistory(store);
+  const history = store ? loadHistory(store) : undefined;
   const scored = await scoreClusters(clusters, run);
-  const { active, suppressed } = splitSuppressed(scored, history);
-  const annotations = store ? labelsFor(scored, history) : undefined;
-  console.log(
-    formatScoredTerminal(active, attempts.length, annotations, suppressed.length),
-  );
-  saveHistory(appendRun(history, buildRecord(scored, attempts.length)), store);
+  const { annotations, active, suppressed } = presentRun(scored, history);
+  console.log(formatScoredTerminal(active, attempts.length, annotations, suppressed.length));
+  persistRun(store, history, scored, attempts.length);
 }
 
 async function main(): Promise<void> {
@@ -80,6 +75,7 @@ async function main(): Promise<void> {
 
   if (command === "suppress" || command === "unsuppress") {
     if (!argument) throw new Error(`latch ${command}: missing <signature>`);
+    if (!store) throw new Error(`latch ${command}: no store configured (LATCH_STORE is empty)`);
     const history = loadHistory(store);
     saveHistory(command === "suppress" ? suppress(history, argument) : unsuppress(history, argument), store);
     console.log(`${command === "suppress" ? "suppressed" : "unsuppressed"}: ${argument}`);

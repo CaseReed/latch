@@ -12,6 +12,9 @@ import {
   isSuppressed,
   labelsFor,
   loadHistory,
+  MAX_RUNS,
+  persistRun,
+  presentRun,
   saveHistory,
   splitSuppressed,
   suppress,
@@ -63,8 +66,10 @@ test("save then load round-trips the history", () => {
 
 test("appendRun keeps only the most recent runs", () => {
   let history = emptyHistory();
-  for (let i = 0; i < 120; i += 1) history = appendRun(history, run(`run-${i}`, [["a|x", 1, 0]]));
-  assert.equal(history.runs.length, 100);
+  for (let i = 0; i < MAX_RUNS + 20; i += 1) {
+    history = appendRun(history, run(`run-${i}`, [["a|x", 1, 0]]));
+  }
+  assert.equal(history.runs.length, MAX_RUNS);
   assert.equal(history.runs[0]?.at, "run-20");
 });
 
@@ -127,6 +132,30 @@ test("splitSuppressed separates known noise from reported clusters", () => {
   );
   assert.deepEqual(active.map((c) => c.signature), ["real|b"]);
   assert.deepEqual(suppressed.map((c) => c.signature), ["noise|a"]);
+});
+
+test("presentRun is a no-op without history and splits plus annotates with it", () => {
+  const clusters = [cluster({ signature: "a|1" }), cluster({ signature: "b|2" })];
+  const disabled = presentRun(clusters, undefined);
+  assert.equal(disabled.annotations, undefined);
+  assert.deepEqual(disabled.active, clusters);
+  assert.deepEqual(disabled.suppressed, []);
+
+  const history = suppress(appendRun(emptyHistory(), run("at", [["a|1", 1, 0]])), "b|*");
+  const presented = presentRun(clusters, history);
+  assert.deepEqual(presented.active.map((c) => c.signature), ["a|1"]);
+  assert.deepEqual(presented.suppressed.map((c) => c.signature), ["b|2"]);
+  assert.equal(presented.annotations?.get("a|1"), "[seen x1]");
+  assert.equal(presented.annotations?.get("b|2"), "[new]");
+});
+
+test("persistRun writes the run, and a falsy store writes nothing", () => {
+  const path = join(mkdtempSync(join(tmpdir(), "latch-persist-")), "store.json");
+  persistRun(path, undefined, [cluster()], 3);
+  const history = loadHistory(path);
+  assert.equal(history.runs.length, 1);
+  assert.equal(history.runs[0]?.total_failed, 3);
+  assert.doesNotThrow(() => persistRun("", undefined, [cluster()], 1));
 });
 
 test("a legacy store without suppressions loads with an empty list", () => {
