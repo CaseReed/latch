@@ -3,7 +3,6 @@ import { askJev, parseJevAnswers } from "./jev.ts";
 import type { CachedJudgment } from "./ledger.ts";
 import { hasApiKey } from "./load-env.ts";
 import { decideAction } from "./policy.ts";
-import { redactSecrets } from "./redact.ts";
 import type { Cluster, ClusterState, RunMeta, ScoredCluster } from "./types.ts";
 
 export const MAX_JEV_CLUSTERS = 8;
@@ -23,8 +22,8 @@ function toState(cluster: Cluster, run: RunMeta): ClusterState {
       flaky_count: cluster.flaky_count,
       signature: cluster.signature,
       apiName: cluster.apiName,
-      representative_error: redactSecrets(cluster.representative_error.slice(0, 400)),
-      sample_titles: cluster.sample_titles.slice(0, 5).map(redactSecrets),
+      representative_error: cluster.representative_error.slice(0, 400),
+      sample_titles: cluster.sample_titles.slice(0, 5),
       sample_locations: cluster.sample_locations.slice(0, 5),
     },
   };

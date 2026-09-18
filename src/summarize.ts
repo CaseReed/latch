@@ -4,8 +4,11 @@ import { isBlocking } from "./policy.ts";
 import type { Cluster, RunMeta, ScoredCluster } from "./types.ts";
 
 export function formatClusterLine(cluster: Cluster, index: number): string {
-  const head = cluster.representative_error.replace(/\s+/g, " ").slice(0, 72);
-  return `  ${index} n=${cluster.size} ${cluster.signature}\n     ${head}`;
+  return `  ${index} n=${cluster.size} ${cluster.signature}\n     ${errorHead(cluster)}`;
+}
+
+function errorHead(cluster: Cluster): string {
+  return cluster.representative_error.replace(/\s+/g, " ").slice(0, 72);
 }
 
 export function formatTerminal(clusters: Cluster[], failed: number): string {
@@ -43,8 +46,7 @@ export function formatScoredTerminal(
     lines.push(
       `P${i} ${cause} n=${cluster.size}${conf}${noul}${blocks}  action=${cluster.action}${reason}${cached}${history ? `  ${history}` : ""}`,
     );
-    const head = cluster.representative_error.replace(/\s+/g, " ").slice(0, 72);
-    lines.push(`     ${head}`);
+    lines.push(`     ${errorHead(cluster)}`);
   }
   const blocking = scored.filter((cluster) => isBlocking(cluster.action)).length;
   lines.push(

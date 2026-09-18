@@ -29,16 +29,7 @@ export type RunMeta = {
 
 export type ClusterState = {
   run: RunMeta;
-  cluster: {
-    size: number;
-    failed_count: number;
-    flaky_count: number;
-    signature: string;
-    apiName: string;
-    representative_error: string;
-    sample_titles: string[];
-    sample_locations: string[];
-  };
+  cluster: Cluster;
 };
 
 export type ScoredCluster = Cluster & {
