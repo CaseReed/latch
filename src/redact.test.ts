@@ -19,6 +19,13 @@ test("a key-shaped token must contain a digit, so plain identifiers survive", ()
   assert.equal(redactSecrets("pk_customer_id"), "pk_customer_id");
 });
 
+test("redaction is idempotent, so a second pass cannot damage the text", () => {
+  const once = redactSecrets("Authorization: Bearer abc123def456 password=hunter2");
+  assert.equal(redactSecrets(once), once);
+  assert.match(once, /Bearer <redacted>/);
+  assert.match(once, /password=<redacted>/);
+});
+
 test("redacts password and token assignments", () => {
   assert.equal(redactSecrets("password=hunter2"), "password=<redacted>");
   assert.equal(redactSecrets("token: abcdef"), "token: <redacted>");

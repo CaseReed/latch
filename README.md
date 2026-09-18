@@ -116,7 +116,7 @@ Thresholds are calibrated (`npm run calibrate`); `blocks_merge` sits in a noise 
 ## Limits
 
 - **Grouping is message-based**, so a logic regression fragments. On `pallets/click`: 2 real regressions → 13 failures → **10 clusters** (see `experiments/click-real`). The "70 → 1" figure is an infra-cascade property, not a general one.
-- Signature = `apiName` + first 80 chars of the normalized error (ANSI/UUID/id tokens/timestamps/durations/pixel diffs stripped; ports kept as service identity).
+- Signature = `apiName` + first 80 chars of the normalized error (ANSI/UUID/id tokens/timestamps/durations/pixel diffs stripped, secrets redacted; ports kept as service identity).
 - Error text is redacted (Bearer tokens, key-shaped tokens, `password=` / `token=`) in **every** output — terminal, `traces/`, the PR comment and the Jev state — not just before it leaves the machine.
 - At most 8 Jev calls per run; cached clusters are free.
 
