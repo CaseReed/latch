@@ -10,6 +10,7 @@ Latch reads a finished test run and returns **one verdict before you merge**:
 | 🔴 **`Gate: BLOCK`** | It's a real failure. Don't merge. |
 
 [![CI](https://github.com/CaseReed/latch/actions/workflows/ci.yml/badge.svg)](https://github.com/CaseReed/latch/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/CaseReed/latch?sort=semver)](https://github.com/CaseReed/latch/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Node](https://img.shields.io/badge/node-%3E%3D20-3fb950?logo=node.js&logoColor=white)](package.json)
 
