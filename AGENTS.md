@@ -43,7 +43,7 @@ clusters (measured in `experiments/click-real`). Never claim otherwise.
 | `npm run test:live` | Jev on the goldens | yes |
 | `npm run calibrate` | verdict flip rate on borderline clusters | yes |
 | `npm run print:clusters` | cluster the env-cascade golden | no |
-| `npm run latch -- <file> [--gate]` | cluster/label a JUnit XML or golden JSON | no\* |
+| `npm run latch -- <file> [--gate] [--html <path>]` | cluster/label a JUnit XML or golden JSON | no\* |
 | `npx tsc --noEmit` | typecheck | no |
 
 \* Without a key, clusters print as `needs_human` / `no_key`; cached judgments
@@ -86,9 +86,9 @@ Tests are colocated: `src/*.test.ts` and `src/ingest/*.test.ts`.
   lists the optional vars (`LATCH_MODEL`, `LATCH_STORE`, pricing overrides).
 - Generated and gitignored: `traces/`, `.latch/`, `test-results/`,
   `experiments/*/results.xml`.
-- The reporter writes `traces/latch-report.json` and `traces/latch.md`; the
-  ledger stores `.latch/store.json`. The only secret ever needed is
-  `TYPESAFE_API_KEY`.
+- The reporter writes `traces/latch-report.json`, `traces/latch.md` and
+  `traces/latch-report.html`; the ledger stores `.latch/store.json`. The only
+  secret ever needed is `TYPESAFE_API_KEY`.
 - `tests/*.spec.ts` are Playwright specs that **fail on purpose** (used by
   `test:e2e` to prove the reporter). Never "fix" them.
 - `experiments/real-pytest` and `experiments/click-real` need a Python venv

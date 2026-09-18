@@ -22,4 +22,5 @@ assert.ok(
   report.clusters.every((cluster) => cluster.action === "needs_human" && cluster.action_reason === "no_key"),
   "without a key every cluster must be needs_human/no_key",
 );
+assert.match(readFileSync("traces/latch-report.html", "utf8"), /Gate:/);
 console.log(`e2e ok: ${report.failed} failed → ${report.clusters.length} causes`);

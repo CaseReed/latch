@@ -21,6 +21,7 @@ import { MAX_JEV_CLUSTERS, scoreClusters } from "./score-run.ts";
 import {
   formatMarkdown,
   formatScoredTerminal,
+  renderHtml,
   writeReports,
 } from "./summarize.ts";
 import type { FailedAttempt, RunMeta } from "./types.ts";
@@ -83,6 +84,13 @@ export default class LatchReporter implements Reporter {
         annotations,
         suppressed.length,
       );
+      const html = renderHtml(
+        active,
+        this.attempts.length,
+        this.meta,
+        annotations,
+        suppressed.length,
+      );
       writeReports(
         "traces",
         {
@@ -92,6 +100,7 @@ export default class LatchReporter implements Reporter {
           suppressed: suppressed.map((cluster) => cluster.signature),
         },
         markdown,
+        html,
       );
       persistRun(store, history, scored, this.attempts.length, cache);
       maybeWriteGitHubSummary(markdown);

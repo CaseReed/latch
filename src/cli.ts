@@ -1,3 +1,5 @@
+import { mkdirSync, writeFileSync } from "node:fs";
+import { dirname } from "node:path";
 import { clusterAttempts } from "./cluster.ts";
 import { loadRunFile } from "./golden.ts";
 import {
@@ -13,26 +15,31 @@ import {
 import "./load-env.ts";
 import { isBlocking } from "./policy.ts";
 import { MAX_JEV_CLUSTERS, scoreClusters } from "./score-run.ts";
-import { formatScoredTerminal } from "./summarize.ts";
+import { formatScoredTerminal, renderHtml } from "./summarize.ts";
 
 const USAGE = [
   "usage:",
-  "  latch <junit.xml | golden.json> [--store <path>] [--gate]   cluster and label a run",
+  "  latch <junit.xml | golden.json> [--store <path>] [--gate] [--html <path>]",
   "  latch suppress <signature> [--store <path>]        mark a cluster as known noise (* wildcard)",
   "  latch unsuppress <signature> [--store <path>]      remove a suppression",
   "  latch suppressions [--store <path>]                list suppressions",
   "",
-  "  --gate exits non-zero when a non-infra cluster would block a merge.",
+  "  --gate  exits non-zero when a non-infra cluster would block a merge.",
+  "  --html  writes a self-contained HTML report to <path>.",
 ].join("\n");
 
-function parseArgs(argv: string[]): { tokens: string[]; store: string; gate: boolean } {
+function parseArgs(argv: string[]): { tokens: string[]; store: string; gate: boolean; html?: string } {
   const tokens: string[] = [];
   let store = storePath();
   let gate = false;
+  let html: string | undefined;
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i]!;
     if (arg === "--store") {
       store = argv[i + 1] ?? store;
+      i += 1;
+    } else if (arg === "--html") {
+      html = argv[i + 1] ?? html;
       i += 1;
     } else if (arg === "--gate") {
       gate = true;
@@ -40,10 +47,10 @@ function parseArgs(argv: string[]): { tokens: string[]; store: string; gate: boo
       tokens.push(arg);
     }
   }
-  return { tokens, store, gate };
+  return { tokens, store, gate, html };
 }
 
-async function analyze(path: string, store: string, gate: boolean): Promise<void> {
+async function analyze(path: string, store: string, gate: boolean, html?: string): Promise<void> {
   const { run, attempts } = loadRunFile(path);
   const clusters = clusterAttempts(attempts);
   const history = store ? loadHistory(store) : undefined;
@@ -51,6 +58,10 @@ async function analyze(path: string, store: string, gate: boolean): Promise<void
   const scored = await scoreClusters(clusters, run, MAX_JEV_CLUSTERS, cache);
   const { annotations, active, suppressed } = presentRun(scored, history);
   console.log(formatScoredTerminal(active, attempts.length, annotations, suppressed.length));
+  if (html) {
+    mkdirSync(dirname(html), { recursive: true });
+    writeFileSync(html, renderHtml(active, attempts.length, run, annotations, suppressed.length));
+  }
   persistRun(store, history, scored, attempts.length, cache);
 
   const blocking = active.filter((cluster) => isBlocking(cluster.action)).length;
@@ -60,7 +71,7 @@ async function analyze(path: string, store: string, gate: boolean): Promise<void
 }
 
 async function main(): Promise<void> {
-  const { tokens, store, gate } = parseArgs(process.argv.slice(2));
+  const { tokens, store, gate, html } = parseArgs(process.argv.slice(2));
   const [command, argument] = tokens;
 
   if (!command || command === "help") {
@@ -84,7 +95,7 @@ async function main(): Promise<void> {
     return;
   }
 
-  await analyze(command, store, gate);
+  await analyze(command, store, gate, html);
 }
 
 try {

@@ -90,6 +90,8 @@ npm run latch -- junit.xml --gate          # exit 1 when a real failure blocks
 
 `latch` reads a JUnit XML report (or a `{ run, attempts }` JSON). The reporter itself never fails Playwright, so the gate exit code is a separate CI step.
 
+Every run writes `traces/latch-report.json`, `traces/latch.md` and a self-contained `traces/latch-report.html` (inline CSS, no external asset) you can open or attach as a CI artifact. `latch <file> --html <path>` writes the same HTML from the CLI.
+
 <details>
 <summary><b>Reference</b> — gate, any runner, ledger, policy, proof</summary>
 

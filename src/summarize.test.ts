@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { formatMarkdown, formatScoredTerminal } from "./summarize.ts";
+import { formatMarkdown, formatScoredTerminal, renderHtml } from "./summarize.ts";
 import type { ScoredCluster } from "./types.ts";
 
 const cluster: ScoredCluster = {
@@ -100,6 +100,22 @@ test("a run whose only failures are suppressed passes the gate", () => {
   const out = formatScoredTerminal([], 8, undefined, 1);
   assert.match(out, /Latch: 8 failed → 0 causes \(1 suppressed\)/);
   assert.match(out, /Gate: PASS/);
+});
+
+test("renderHtml escapes untrusted text and shows the verdict", () => {
+  const nasty: ScoredCluster = {
+    ...cluster,
+    representative_error: "<script>alert(1)</script>",
+    action: "fix_product",
+  };
+  const html = renderHtml([nasty], 5, { workers: 1, retries_config: 0 });
+  assert.doesNotMatch(html, /<script>alert/);
+  assert.match(html, /&lt;script&gt;/);
+  assert.match(html, /Gate: BLOCK/);
+  assert.match(
+    renderHtml([{ ...cluster, action: "ignore_as_infra" }], 5, { workers: 1, retries_config: 0 }),
+    /Gate: PASS/,
+  );
 });
 
 test("cached clusters are not counted as Jev calls in the footer", () => {
