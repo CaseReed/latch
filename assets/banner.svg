@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 360" width="1280" height="360" role="img" aria-label="Latch — is this red your code, or the environment?">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b1220"/>
+      <stop offset="1" stop-color="#111827"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#58a6ff"/>
+      <stop offset="1" stop-color="#a371f7"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1280" height="360" rx="24" fill="url(#bg)"/>
+  <rect x="0" y="0" width="10" height="360" fill="url(#accent)"/>
+
+  <!-- mark: a latch -->
+  <g transform="translate(80 92)">
+    <rect x="0" y="0" width="14" height="72" rx="7" fill="url(#accent)"/>
+    <rect x="20" y="30" width="44" height="14" rx="7" fill="#e6edf3" opacity="0.9"/>
+    <circle cx="72" cy="37" r="13" fill="#e6edf3"/>
+  </g>
+
+  <text x="188" y="160" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="108" font-weight="700" fill="#e6edf3" letter-spacing="-2">Latch</text>
+
+  <text x="190" y="212" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="30" fill="#8b949e">Your CI is red. Is it your code — or the environment?</text>
+
+  <g font-family="ui-sans-serif, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="26" font-weight="600">
+    <rect x="80" y="258" width="330" height="58" rx="29" fill="#3fb950" opacity="0.14" stroke="#3fb950" stroke-opacity="0.5"/>
+    <circle cx="118" cy="287" r="8" fill="#3fb950"/>
+    <text x="146" y="296" fill="#3fb950">Gate: PASS — merge</text>
+
+    <rect x="440" y="258" width="400" height="58" rx="29" fill="#f85149" opacity="0.14" stroke="#f85149" stroke-opacity="0.5"/>
+    <circle cx="478" cy="287" r="8" fill="#f85149"/>
+    <text x="506" y="296" fill="#f85149">Gate: BLOCK — do not merge</text>
+  </g>
+</svg>

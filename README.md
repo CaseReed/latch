@@ -1,17 +1,8 @@
-# Latch
-
-### Your CI is red. Is it your code — or the environment?
-
-Latch reads your test results and gives you **one answer before you merge**:
-
-```
-Gate: PASS    →  it's the environment. Ignore it, merge.
-Gate: BLOCK   →  it's a real failure. Don't merge.
-```
+![Latch — your CI is red. Is it your code, or the environment?](assets/banner.svg)
 
 [![CI](https://github.com/CaseReed/latch/actions/workflows/ci.yml/badge.svg)](https://github.com/CaseReed/latch/actions/workflows/ci.yml)
 
-Read-only. No test rewrite. Works with the runner you already use.
+Latch reads your test results and returns one verdict before you merge: **`PASS`** (the environment — ignore it) or **`BLOCK`** (a real failure — don't merge). Read-only, no test rewrite, works with the runner you already use.
 
 ```bash
 npm install && npm run demo        # no key, no network, ~10 seconds
@@ -148,3 +139,7 @@ npm run demo             # offline merge-gate demo
 ## Out of scope
 
 Wrapper `test()`, auto-fix, browser agents, a second LLM, a general "group every failure into a cause" claim.
+
+## License
+
+MIT — see [LICENSE](LICENSE). The hosted app, if it exists one day, can be separate.
