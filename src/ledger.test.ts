@@ -6,6 +6,7 @@ import { test } from "node:test";
 import {
   appendRun,
   buildRecord,
+  DEFAULT_STORE,
   emptyHistory,
   historyLabel,
   historyStats,
@@ -17,6 +18,7 @@ import {
   presentRun,
   saveHistory,
   splitSuppressed,
+  storePath,
   suppress,
   unsuppress,
   type RunRecord,
@@ -55,6 +57,21 @@ function run(at: string, signatures: Array<[string, number, number]>): RunRecord
 
 test("a missing store reads as empty history", () => {
   assert.deepEqual(loadHistory(join(tmpdir(), "latch-does-not-exist.json")), emptyHistory());
+});
+
+test("storePath honours LATCH_STORE, including an empty value that disables it", () => {
+  const saved = process.env.LATCH_STORE;
+  try {
+    process.env.LATCH_STORE = "/tmp/latch-store.json";
+    assert.equal(storePath(), "/tmp/latch-store.json");
+    process.env.LATCH_STORE = "";
+    assert.equal(storePath(), "");
+    delete process.env.LATCH_STORE;
+    assert.equal(storePath(), DEFAULT_STORE);
+  } finally {
+    if (saved === undefined) delete process.env.LATCH_STORE;
+    else process.env.LATCH_STORE = saved;
+  }
 });
 
 test("save then load round-trips the history", () => {

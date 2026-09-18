@@ -49,3 +49,12 @@ test("a root-level testsuite is ingested too", () => {
   assert.equal(attempts.length, 1);
   assert.equal(attempts[0]?.apiName, "Error");
 });
+
+test("a failure without a message attribute falls back to its text", () => {
+  const { attempts } = ingestJUnit(
+    '<testsuite name="x" tests="1"><testcase name="a"><failure>Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8080/</failure></testcase></testsuite>',
+  );
+  assert.equal(attempts.length, 1);
+  assert.equal(attempts[0]?.apiName, "page.goto");
+  assert.match(attempts[0]?.errorMessage ?? "", /ERR_CONNECTION_REFUSED/);
+});
