@@ -1,0 +1,66 @@
+{
+  "run": {
+    "workers": 2,
+    "retries_config": 2,
+    "duration_ms": 18000,
+    "test_count": 8
+  },
+  "attempts": [
+    {
+      "title": "saves draft",
+      "location": "tests/toast-00.spec.ts:14",
+      "status": "flaky",
+      "apiName": "locator.waitFor",
+      "errorMessage": "TimeoutError: locator.waitFor: Timeout 5000ms exceeded.\nCall log:\n  - waiting for getByTestId(\"toast\") to be visible"
+    },
+    {
+      "title": "uploads avatar",
+      "location": "tests/toast-01.spec.ts:14",
+      "status": "flaky",
+      "apiName": "locator.waitFor",
+      "errorMessage": "TimeoutError: locator.waitFor: Timeout 5000ms exceeded.\nCall log:\n  - waiting for getByTestId(\"toast\") to be visible"
+    },
+    {
+      "title": "sends invite",
+      "location": "tests/toast-02.spec.ts:14",
+      "status": "flaky",
+      "apiName": "locator.waitFor",
+      "errorMessage": "TimeoutError: locator.waitFor: Timeout 5000ms exceeded.\nCall log:\n  - waiting for getByTestId(\"toast\") to be visible"
+    },
+    {
+      "title": "closes modal",
+      "location": "tests/toast-03.spec.ts:14",
+      "status": "flaky",
+      "apiName": "locator.waitFor",
+      "errorMessage": "TimeoutError: locator.waitFor: Timeout 5000ms exceeded.\nCall log:\n  - waiting for getByTestId(\"toast\") to be visible"
+    },
+    {
+      "title": "applies filter",
+      "location": "tests/toast-04.spec.ts:14",
+      "status": "flaky",
+      "apiName": "locator.waitFor",
+      "errorMessage": "TimeoutError: locator.waitFor: Timeout 5000ms exceeded.\nCall log:\n  - waiting for getByTestId(\"toast\") to be visible"
+    },
+    {
+      "title": "paginates table",
+      "location": "tests/toast-05.spec.ts:14",
+      "status": "failed",
+      "apiName": "locator.waitFor",
+      "errorMessage": "TimeoutError: locator.waitFor: Timeout 5000ms exceeded.\nCall log:\n  - waiting for getByTestId(\"toast\") to be visible"
+    },
+    {
+      "title": "exports csv",
+      "location": "tests/toast-06.spec.ts:14",
+      "status": "failed",
+      "apiName": "locator.waitFor",
+      "errorMessage": "TimeoutError: locator.waitFor: Timeout 5000ms exceeded.\nCall log:\n  - waiting for getByTestId(\"toast\") to be visible"
+    },
+    {
+      "title": "opens preview",
+      "location": "tests/toast-07.spec.ts:14",
+      "status": "failed",
+      "apiName": "locator.waitFor",
+      "errorMessage": "TimeoutError: locator.waitFor: Timeout 5000ms exceeded.\nCall log:\n  - waiting for getByTestId(\"toast\") to be visible"
+    }
+  ]
+}

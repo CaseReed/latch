@@ -1,5 +1,5 @@
 import type { TestCase, TestResult, TestStep } from "@playwright/test/reporter";
-import { deriveApiName } from "./attempt.ts";
+import { cleanErrorMessage, deriveApiName } from "./attempt.ts";
 import type { FailedAttempt } from "./types.ts";
 
 function walkSteps(steps: TestStep[]): TestStep[] {
@@ -16,7 +16,9 @@ export function toFailedAttempt(
   result: TestResult,
   flaky: boolean,
 ): FailedAttempt {
-  const errorMessage = result.error?.message ?? result.errors[0]?.message ?? "";
+  const errorMessage = cleanErrorMessage(
+    result.error?.message ?? result.errors[0]?.message ?? "",
+  );
   const failedSteps = walkSteps(result.steps ?? []).filter((step) => step.error);
   const preferred = failedSteps.filter(
     (step) => step.category === "pw:api" || step.category === "expect",

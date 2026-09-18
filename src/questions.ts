@@ -16,26 +16,26 @@ export function buildQuestions(_state: ClusterState) {
           ],
         },
         flake: {
-          what: "Intermittent: retries later pass, race, animation, network jitter.",
-          not_for: "Every attempt fails the same way with no pass.",
+          what: "Intermittent: retries later pass, race, animation, network jitter. If `cluster.flaky_count` is at least 1, Playwright recorded a pass after a fail.",
+          not_for: "Every attempt fails the same way with no pass (`cluster.flaky_count` is 0).",
           examples: [
-            "Failed then passed on retry (Playwright flaky)",
-            "Timeout only under load",
+            "Failed then passed on retry (Playwright flaky_count >= 1)",
+            "locator.waitFor toast timeout that later passes",
           ],
         },
         locator_drift: {
           what: "Selector no longer matches the live DOM (copy, role, test id, layout).",
           not_for: "The app is down or the assertion logic itself is wrong.",
           examples: [
-            "strict mode violation, locator resolved to 0 elements",
+            "strict mode violation: getByTestId('submit') resolved to 2 elements",
             "getByRole name no longer matches the button label",
           ],
         },
         assertion_bug: {
-          what: "The test expectation is wrong or stale versus correct product behavior.",
-          not_for: "Infra down or a missing locator.",
+          what: "The test expectation is wrong or stale versus correct product behavior. Typical: `expect.toHaveText` Expected vs Received copy or money.",
+          not_for: "Infra down, a missing locator, or a timeout waiting for an element.",
           examples: [
-            "toHaveText expected old copy after a product change",
+            "toHaveText Expected Invoice total $42.00 Received $41.00",
             "asserted the wrong URL after a valid redirect",
           ],
         },

@@ -47,6 +47,8 @@ export type ScoredCluster = Cluster & {
   cause_confidence?: number;
   same_root?: number;
   blocks_merge?: number;
+  /** Jev's own `action` answer, kept for transparency; code policy owns `action`. */
+  jev_action?: string;
   action: string;
   action_reason?: string;
   severity?: number;

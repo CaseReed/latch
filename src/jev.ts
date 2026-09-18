@@ -10,8 +10,24 @@ export type JevCall = {
   cost_estimate_usd: number;
 };
 
-const INPUT_USD_PER_MTOK = 0.3;
-const OUTPUT_USD_PER_MTOK = 2.5;
+const DEFAULT_MODEL = "jev-latest";
+const DEFAULT_INPUT_USD_PER_MTOK = 0.3;
+const DEFAULT_OUTPUT_USD_PER_MTOK = 2.5;
+
+function envNumber(name: string, fallback: number): number {
+  const value = Number(process.env[name]);
+  return Number.isFinite(value) && value >= 0 ? value : fallback;
+}
+
+function jevModel(): string {
+  return process.env.LATCH_MODEL?.trim() || DEFAULT_MODEL;
+}
+
+function estimateCostUsd(inputTokens: number, outputTokens: number): number {
+  const input = envNumber("LATCH_INPUT_USD_PER_MTOK", DEFAULT_INPUT_USD_PER_MTOK);
+  const output = envNumber("LATCH_OUTPUT_USD_PER_MTOK", DEFAULT_OUTPUT_USD_PER_MTOK);
+  return (inputTokens * input + outputTokens * output) / 1_000_000;
+}
 
 function asRecord(value: unknown): Record<string, unknown> {
   return value && typeof value === "object" && !Array.isArray(value)
@@ -65,23 +81,22 @@ export function parseJevAnswers(raw: unknown): {
   };
 }
 
-export async function askJev(state: ClusterState): Promise<JevCall> {
-  const client = new TypeSafeClient();
+export async function askJev(
+  state: ClusterState,
+  client: TypeSafeClient = new TypeSafeClient(),
+): Promise<JevCall> {
   const started = Date.now();
   const result = await client.systemOne({
     state,
-    model: "jev-latest",
+    model: jevModel(),
     questions: buildQuestions(state),
   });
   const usage = result.usage ?? { input_tokens: 0, output_tokens: 0 };
-  const cost_estimate_usd =
-    (usage.input_tokens * INPUT_USD_PER_MTOK + usage.output_tokens * OUTPUT_USD_PER_MTOK) /
-    1_000_000;
   return {
     answers: asRecord(result.answers),
-    model: result.model || "jev-latest",
+    model: result.model || jevModel(),
     usage,
     latency_ms: Date.now() - started,
-    cost_estimate_usd,
+    cost_estimate_usd: estimateCostUsd(usage.input_tokens, usage.output_tokens),
   };
 }

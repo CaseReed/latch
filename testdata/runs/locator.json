@@ -1,0 +1,73 @@
+{
+  "run": {
+    "workers": 1,
+    "retries_config": 0,
+    "duration_ms": 9000,
+    "test_count": 9
+  },
+  "attempts": [
+    {
+      "title": "submit order",
+      "location": "tests/submit-order.spec.ts:22",
+      "status": "failed",
+      "apiName": "locator.click",
+      "errorMessage": "Error: locator.click: Error: strict mode violation: getByTestId('submit') resolved to 2 elements:\n    1) <button data-testid=\"submit\">Save</button>\n    2) <button data-testid=\"submit\">Save draft</button>"
+    },
+    {
+      "title": "submit profile",
+      "location": "tests/submit-profile.spec.ts:22",
+      "status": "failed",
+      "apiName": "locator.click",
+      "errorMessage": "Error: locator.click: Error: strict mode violation: getByTestId('submit') resolved to 2 elements:\n    1) <button data-testid=\"submit\">Save</button>\n    2) <button data-testid=\"submit\">Save draft</button>"
+    },
+    {
+      "title": "submit invite",
+      "location": "tests/submit-invite.spec.ts:22",
+      "status": "failed",
+      "apiName": "locator.click",
+      "errorMessage": "Error: locator.click: Error: strict mode violation: getByTestId('submit') resolved to 2 elements:\n    1) <button data-testid=\"submit\">Save</button>\n    2) <button data-testid=\"submit\">Save draft</button>"
+    },
+    {
+      "title": "submit invoice",
+      "location": "tests/submit-invoice.spec.ts:22",
+      "status": "failed",
+      "apiName": "locator.click",
+      "errorMessage": "Error: locator.click: Error: strict mode violation: getByTestId('submit') resolved to 2 elements:\n    1) <button data-testid=\"submit\">Save</button>\n    2) <button data-testid=\"submit\">Save draft</button>"
+    },
+    {
+      "title": "submit comment",
+      "location": "tests/submit-comment.spec.ts:22",
+      "status": "failed",
+      "apiName": "locator.click",
+      "errorMessage": "Error: locator.click: Error: strict mode violation: getByTestId('submit') resolved to 2 elements:\n    1) <button data-testid=\"submit\">Save</button>\n    2) <button data-testid=\"submit\">Save draft</button>"
+    },
+    {
+      "title": "submit settings",
+      "location": "tests/submit-settings.spec.ts:22",
+      "status": "failed",
+      "apiName": "locator.click",
+      "errorMessage": "Error: locator.click: Error: strict mode violation: getByTestId('submit') resolved to 2 elements:\n    1) <button data-testid=\"submit\">Save</button>\n    2) <button data-testid=\"submit\">Save draft</button>"
+    },
+    {
+      "title": "submit team",
+      "location": "tests/submit-team.spec.ts:22",
+      "status": "failed",
+      "apiName": "locator.click",
+      "errorMessage": "Error: locator.click: Error: strict mode violation: getByTestId('submit') resolved to 2 elements:\n    1) <button data-testid=\"submit\">Save</button>\n    2) <button data-testid=\"submit\">Save draft</button>"
+    },
+    {
+      "title": "submit billing",
+      "location": "tests/submit-billing.spec.ts:22",
+      "status": "failed",
+      "apiName": "locator.click",
+      "errorMessage": "Error: locator.click: Error: strict mode violation: getByTestId('submit') resolved to 2 elements:\n    1) <button data-testid=\"submit\">Save</button>\n    2) <button data-testid=\"submit\">Save draft</button>"
+    },
+    {
+      "title": "submit webhook",
+      "location": "tests/submit-webhook.spec.ts:22",
+      "status": "failed",
+      "apiName": "locator.click",
+      "errorMessage": "Error: locator.click: Error: strict mode violation: getByTestId('submit') resolved to 2 elements:\n    1) <button data-testid=\"submit\">Save</button>\n    2) <button data-testid=\"submit\">Save draft</button>"
+    }
+  ]
+}

@@ -31,23 +31,37 @@ function pullRequestNumber(): string | undefined {
   }
 }
 
+const COMMENT_MARKER = "<!-- latch-report -->";
+
 export async function maybeCommentOnPullRequest(markdown: string): Promise<void> {
   try {
     const token = process.env.GITHUB_TOKEN;
     const repo = process.env.GITHUB_REPOSITORY;
     const pr = pullRequestNumber();
     if (!token || !repo || !pr) return;
-    const res = await fetch(`https://api.github.com/repos/${repo}/issues/${pr}/comments`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: "application/vnd.github+json",
-        "X-GitHub-Api-Version": "2022-11-28",
-      },
-      body: JSON.stringify({ body: markdown.slice(0, 60_000) }),
-    });
-    if (!res.ok) {
-      console.error(`[latch] GitHub comment failed: ${res.status}`);
+
+    const headers = {
+      Authorization: `Bearer ${token}`,
+      Accept: "application/vnd.github+json",
+      "X-GitHub-Api-Version": "2022-11-28",
+      "Content-Type": "application/json",
+    };
+    const base = `https://api.github.com/repos/${repo}/issues/${pr}/comments`;
+    const body = `${COMMENT_MARKER}\n${markdown}`.slice(0, 60_000);
+
+    const listRes = await fetch(`${base}?per_page=100`, { headers });
+    if (!listRes.ok) {
+      console.error(`[latch] GitHub comment list failed: ${listRes.status}`);
+      return;
+    }
+    const comments = (await listRes.json()) as Array<{ id: number; body?: string }>;
+    const existing = comments.find((comment) => comment.body?.includes(COMMENT_MARKER));
+
+    const writeRes = existing
+      ? await fetch(`${base}/${existing.id}`, { method: "PATCH", headers, body: JSON.stringify({ body }) })
+      : await fetch(base, { method: "POST", headers, body: JSON.stringify({ body }) });
+    if (!writeRes.ok) {
+      console.error(`[latch] GitHub comment failed: ${writeRes.status}`);
     }
   } catch (error) {
     console.error(`[latch] GitHub comment failed: ${errMsg(error)}`);

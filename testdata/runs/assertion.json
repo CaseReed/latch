@@ -1,0 +1,45 @@
+{
+  "run": {
+    "workers": 1,
+    "retries_config": 0,
+    "duration_ms": 4000,
+    "test_count": 5
+  },
+  "attempts": [
+    {
+      "title": "checkout summary",
+      "location": "tests/invoice-0.spec.ts:31",
+      "status": "failed",
+      "apiName": "expect.toHaveText",
+      "errorMessage": "Error: expect(locator).toHaveText() failed\n\nLocator: getByRole('heading')\nExpected string: \"Invoice total $42.00\"\nReceived string: \"Invoice total $41.00\""
+    },
+    {
+      "title": "invoice pdf",
+      "location": "tests/invoice-1.spec.ts:31",
+      "status": "failed",
+      "apiName": "expect.toHaveText",
+      "errorMessage": "Error: expect(locator).toHaveText() failed\n\nLocator: getByRole('heading')\nExpected string: \"Invoice total $42.00\"\nReceived string: \"Invoice total $41.00\""
+    },
+    {
+      "title": "email receipt",
+      "location": "tests/invoice-2.spec.ts:31",
+      "status": "failed",
+      "apiName": "expect.toHaveText",
+      "errorMessage": "Error: expect(locator).toHaveText() failed\n\nLocator: getByRole('heading')\nExpected string: \"Invoice total $42.00\"\nReceived string: \"Invoice total $41.00\""
+    },
+    {
+      "title": "admin order",
+      "location": "tests/invoice-3.spec.ts:31",
+      "status": "failed",
+      "apiName": "expect.toHaveText",
+      "errorMessage": "Error: expect(locator).toHaveText() failed\n\nLocator: getByRole('heading')\nExpected string: \"Invoice total $42.00\"\nReceived string: \"Invoice total $41.00\""
+    },
+    {
+      "title": "customer portal",
+      "location": "tests/invoice-4.spec.ts:31",
+      "status": "failed",
+      "apiName": "expect.toHaveText",
+      "errorMessage": "Error: expect(locator).toHaveText() failed\n\nLocator: getByRole('heading')\nExpected string: \"Invoice total $42.00\"\nReceived string: \"Invoice total $41.00\""
+    }
+  ]
+}

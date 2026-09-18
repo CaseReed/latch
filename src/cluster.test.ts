@@ -1,14 +1,11 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import { test } from "node:test";
 import { clusterAttempts } from "./cluster.ts";
+import { loadGolden } from "./golden.ts";
 import { formatTerminal } from "./summarize.ts";
-import type { FailedAttempt } from "./types.ts";
-
-const GOLDEN = "testdata/runs/env-cascade.json";
 
 test("env-cascade golden: 73 failed → 4 causes, 70 connection-refused in bucket 0", () => {
-  const data = JSON.parse(readFileSync(GOLDEN, "utf8")) as { attempts: FailedAttempt[] };
+  const data = loadGolden("env-cascade");
   assert.equal(data.attempts.length, 73);
   const clusters = clusterAttempts(data.attempts);
   const report = formatTerminal(clusters, data.attempts.length);
@@ -21,6 +18,34 @@ test("env-cascade golden: 73 failed → 4 causes, 70 connection-refused in bucke
   assert.match(report, /n=70/);
   const sizes = clusters.map((c) => c.size).sort((a, b) => b - a);
   assert.deepEqual(sizes, [70, 1, 1, 1]);
+});
+
+test("flake golden: one cluster with flaky retries", () => {
+  const data = loadGolden("flake");
+  const clusters = clusterAttempts(data.attempts);
+  assert.equal(clusters.length, 1);
+  assert.equal(clusters[0]?.size, 8);
+  assert.equal(clusters[0]?.flaky_count, 5);
+  assert.equal(clusters[0]?.failed_count, 3);
+  assert.equal(clusters[0]?.apiName, "locator.waitFor");
+});
+
+test("locator golden: one strict-mode cluster", () => {
+  const data = loadGolden("locator");
+  const clusters = clusterAttempts(data.attempts);
+  assert.equal(clusters.length, 1);
+  assert.equal(clusters[0]?.size, 9);
+  assert.equal(clusters[0]?.apiName, "locator.click");
+  assert.match(clusters[0]?.representative_error ?? "", /strict mode/);
+});
+
+test("assertion golden: one expect.toHaveText cluster", () => {
+  const data = loadGolden("assertion");
+  const clusters = clusterAttempts(data.attempts);
+  assert.equal(clusters.length, 1);
+  assert.equal(clusters[0]?.size, 5);
+  assert.equal(clusters[0]?.apiName, "expect.toHaveText");
+  assert.match(clusters[0]?.representative_error ?? "", /Invoice total/);
 });
 
 test("zero attempts is zero clusters", () => {

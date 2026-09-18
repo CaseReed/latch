@@ -23,14 +23,17 @@ export function formatScoredTerminal(scored: ScoredCluster[], failed: number): s
   ];
   for (const [i, cluster] of scored.entries()) {
     const cause = cluster.cause ?? "unscored";
-    const noul =
-      cluster.same_root !== undefined ? ` same_root=${cluster.same_root.toFixed(2)}` : "";
     const conf =
       cluster.cause_confidence !== undefined
         ? ` conf=${cluster.cause_confidence.toFixed(2)}`
         : "";
+    const noul =
+      cluster.same_root !== undefined ? ` same_root=${cluster.same_root.toFixed(2)}` : "";
+    const blocks =
+      cluster.blocks_merge !== undefined ? ` blocks=${cluster.blocks_merge.toFixed(2)}` : "";
+    const reason = cluster.action_reason ? ` (${cluster.action_reason})` : "";
     lines.push(
-      `P${i} ${cause} n=${cluster.size}${conf}${noul}  action=${cluster.action}`,
+      `P${i} ${cause} n=${cluster.size}${conf}${noul}${blocks}  action=${cluster.action}${reason}`,
     );
     const head = cluster.representative_error.replace(/\s+/g, " ").slice(0, 72);
     lines.push(`     ${head}`);
@@ -46,7 +49,7 @@ export function formatMarkdown(
   const lines = [
     `# Latch`,
     ``,
-    `${failed} failed → ${scored.length} causes · workers=${meta.workers} retries=${meta.retries_config}`,
+    `${failed} failed → ${scored.length} cause${scored.length === 1 ? "" : "s"} · workers=${meta.workers} retries=${meta.retries_config}`,
     ``,
   ];
   if (scored.length === 0) {
@@ -66,6 +69,9 @@ export function formatMarkdown(
     if (cluster.blocks_merge !== undefined) {
       lines.push(`- blocks_merge: ${cluster.blocks_merge.toFixed(2)}`);
     }
+    if (cluster.jev_action !== undefined) {
+      lines.push(`- Jev action: \`${cluster.jev_action}\``);
+    }
     lines.push(`- signature: \`${cluster.signature}\``);
     lines.push(`- sample: ${cluster.sample_titles.slice(0, 3).join("; ") || "—"}`);
     lines.push("");
@@ -73,6 +79,25 @@ export function formatMarkdown(
     lines.push(cluster.representative_error.slice(0, 400));
     lines.push("```");
     lines.push("");
+  }
+
+  const called = scored.filter((cluster) => cluster.scored);
+  if (called.length > 0) {
+    const usage = called.reduce(
+      (total, cluster) => ({
+        input: total.input + (cluster.usage?.input_tokens ?? 0),
+        output: total.output + (cluster.usage?.output_tokens ?? 0),
+      }),
+      { input: 0, output: 0 },
+    );
+    const latency = called.reduce((total, cluster) => total + (cluster.latency_ms ?? 0), 0);
+    const cost = called.reduce((total, cluster) => total + (cluster.cost_estimate_usd ?? 0), 0);
+    const models = [...new Set(called.map((cluster) => cluster.model).filter(Boolean))];
+    lines.push(`Jev: ${called.length} call${called.length === 1 ? "" : "s"} · ${models.join(", ")}`);
+    lines.push(
+      `tokens in/out: ${usage.input}/${usage.output} · latency: ${latency}ms · est. cost: $${cost.toFixed(4)}`,
+    );
+    lines.push("Estimate only; override with `LATCH_INPUT_USD_PER_MTOK` / `LATCH_OUTPUT_USD_PER_MTOK`.");
   }
   return lines.join("\n");
 }
