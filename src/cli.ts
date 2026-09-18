@@ -3,6 +3,7 @@ import { extname } from "node:path";
 import { clusterAttempts } from "./cluster.ts";
 import { ingestJUnit } from "./ingest/junit.ts";
 import {
+  judgmentCache,
   loadHistory,
   persistRun,
   presentRun,
@@ -12,7 +13,7 @@ import {
   unsuppress,
 } from "./ledger.ts";
 import "./load-env.ts";
-import { scoreClusters } from "./score-run.ts";
+import { MAX_JEV_CLUSTERS, scoreClusters } from "./score-run.ts";
 import { formatScoredTerminal } from "./summarize.ts";
 import type { FailedAttempt, RunMeta } from "./types.ts";
 
@@ -57,10 +58,11 @@ async function analyze(path: string, store: string): Promise<void> {
   const { run, attempts } = readInput(path);
   const clusters = clusterAttempts(attempts);
   const history = store ? loadHistory(store) : undefined;
-  const scored = await scoreClusters(clusters, run);
+  const cache = history ? judgmentCache(history) : undefined;
+  const scored = await scoreClusters(clusters, run, MAX_JEV_CLUSTERS, cache);
   const { annotations, active, suppressed } = presentRun(scored, history);
   console.log(formatScoredTerminal(active, attempts.length, annotations, suppressed.length));
-  persistRun(store, history, scored, attempts.length);
+  persistRun(store, history, scored, attempts.length, cache);
 }
 
 async function main(): Promise<void> {

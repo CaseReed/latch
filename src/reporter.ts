@@ -10,13 +10,14 @@ import "./load-env.ts";
 import { clusterAttempts } from "./cluster.ts";
 import { maybeCommentOnPullRequest, maybeWriteGitHubSummary } from "./github.ts";
 import {
+  judgmentCache,
   loadHistory,
   persistRun,
   presentRun,
   storePath,
 } from "./ledger.ts";
 import { toFailedAttempt } from "./playwright-attempt.ts";
-import { scoreClusters } from "./score-run.ts";
+import { MAX_JEV_CLUSTERS, scoreClusters } from "./score-run.ts";
 import {
   formatMarkdown,
   formatScoredTerminal,
@@ -70,7 +71,8 @@ export default class LatchReporter implements Reporter {
       const clusters = clusterAttempts(this.attempts);
       const store = storePath();
       const history = store ? loadHistory(store) : undefined;
-      const scored = await scoreClusters(clusters, this.meta);
+      const cache = history ? judgmentCache(history) : undefined;
+      const scored = await scoreClusters(clusters, this.meta, MAX_JEV_CLUSTERS, cache);
       const { annotations, active, suppressed } = presentRun(scored, history);
       const text = formatScoredTerminal(active, this.attempts.length, annotations, suppressed.length);
       console.log(text);
@@ -91,7 +93,7 @@ export default class LatchReporter implements Reporter {
         },
         markdown,
       );
-      persistRun(store, history, scored, this.attempts.length);
+      persistRun(store, history, scored, this.attempts.length, cache);
       maybeWriteGitHubSummary(markdown);
       await maybeCommentOnPullRequest(markdown);
     } catch (error) {

@@ -11,8 +11,10 @@ import {
   historyLabel,
   historyStats,
   isSuppressed,
+  judgmentCache,
   labelsFor,
   loadHistory,
+  MAX_JUDGMENTS,
   MAX_RUNS,
   persistRun,
   presentRun,
@@ -21,6 +23,8 @@ import {
   storePath,
   suppress,
   unsuppress,
+  withJudgments,
+  type CachedJudgment,
   type RunRecord,
 } from "./ledger.ts";
 import type { ScoredCluster } from "./types.ts";
@@ -101,6 +105,7 @@ test("historyStats aggregates seen, failed and flaky totals per signature", () =
       ]),
     ],
     suppressed: [],
+    judgments: {},
   };
   const stats = historyStats(history);
   assert.deepEqual(stats.get("a|x"), {
@@ -123,6 +128,7 @@ test("historyLabel marks unseen clusters new and reports the flake rate", () => 
       run("2026-09-02T00:00:00.000Z", [["a|x", 1, 2]]),
     ],
     suppressed: [],
+    judgments: {},
   });
   assert.equal(historyLabel(stats.get("a|x")), "[seen x2, flake 50%]");
 });
@@ -175,9 +181,36 @@ test("persistRun writes the run, and a falsy store writes nothing", () => {
   assert.doesNotThrow(() => persistRun("", undefined, [cluster()], 1));
 });
 
+test("judgmentCache and withJudgments round-trip and cap the store", () => {
+  const history = { ...emptyHistory(), judgments: { "a|1": { cause: "flake" } } };
+  assert.equal(judgmentCache(history).get("a|1")?.cause, "flake");
+
+  const big = new Map<string, CachedJudgment>();
+  for (let i = 0; i < MAX_JUDGMENTS + 10; i += 1) big.set(`s|${i}`, { cause: "flake" });
+  const merged = withJudgments(emptyHistory(), big);
+  assert.equal(Object.keys(merged.judgments).length, MAX_JUDGMENTS);
+  assert.ok(merged.judgments[`s|${MAX_JUDGMENTS + 9}`]);
+});
+
+test("loadHistory sanitizes judgments and defaults a missing map", () => {
+  const dir = mkdtempSync(join(tmpdir(), "latch-judg-"));
+  const path = join(dir, "store.json");
+  writeFileSync(
+    path,
+    JSON.stringify({ version: 1, runs: [], judgments: { "a|1": { cause: "flake" }, bad: 3 } }),
+  );
+  assert.deepEqual(loadHistory(path).judgments, { "a|1": { cause: "flake" } });
+
+  saveHistory(emptyHistory(), path);
+  const raw = JSON.parse(readFileSync(path, "utf8")) as { judgments?: unknown };
+  delete raw.judgments;
+  writeFileSync(path, JSON.stringify(raw));
+  assert.deepEqual(loadHistory(path).judgments, {});
+});
+
 test("a legacy store without suppressions loads with an empty list", () => {
   const path = join(mkdtempSync(join(tmpdir(), "latch-legacy-")), "store.json");
-  saveHistory({ version: 1, runs: [], suppressed: [] }, path);
+  saveHistory({ version: 1, runs: [], suppressed: [], judgments: {} }, path);
   const raw = JSON.parse(readFileSync(path, "utf8")) as { suppressed?: string[] };
   delete raw.suppressed;
   writeFileSync(path, JSON.stringify(raw));

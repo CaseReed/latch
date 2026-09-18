@@ -6,7 +6,7 @@
     "node": ">=20"
   },
   "scripts": {
-    "test:unit": "tsx --test src/attempt.test.ts src/cluster.test.ts src/policy.test.ts src/github.test.ts src/redact.test.ts src/reporter.test.ts src/summarize.test.ts src/ledger.test.ts src/ingest/junit.test.ts",
+    "test:unit": "tsx --test src/attempt.test.ts src/cluster.test.ts src/policy.test.ts src/github.test.ts src/redact.test.ts src/reporter.test.ts src/summarize.test.ts src/ledger.test.ts src/score-run.test.ts src/ingest/junit.test.ts",
     "test:live": "tsx --test src/reporter.live.test.ts",
     "test:e2e": "tsx src/e2e-check.ts",
     "test:stability": "tsx src/stability-check.ts",

@@ -81,6 +81,8 @@ npm run latch -- testdata/runs/env-cascade.json --store /tmp/s.json
 
 Suppressed clusters are hidden from the report but still counted in history. The store keeps the last 100 runs; in CI it must be cached or committed to persist.
 
+Jev judgments are cached per signature: a cluster already judged is reused (`[cached]`), so it costs no Jev call, does not count against the 8-call cap, and a known run still reports with no API key at all. The store is written atomically so a concurrent or interrupted save cannot corrupt it.
+
 ## Policy (code)
 
 1. No key / API error → `needs_human`

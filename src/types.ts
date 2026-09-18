@@ -43,6 +43,8 @@ export type ClusterState = {
 
 export type ScoredCluster = Cluster & {
   scored: boolean;
+  /** True when the Jev judgment was reused from the ledger instead of a fresh call. */
+  cached?: boolean;
   cause?: string;
   cause_confidence?: number;
   same_root?: number;

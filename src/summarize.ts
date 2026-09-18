@@ -37,9 +37,10 @@ export function formatScoredTerminal(
     const blocks =
       cluster.blocks_merge !== undefined ? ` blocks=${cluster.blocks_merge.toFixed(2)}` : "";
     const reason = cluster.action_reason ? ` (${cluster.action_reason})` : "";
+    const cached = cluster.cached ? " [cached]" : "";
     const history = annotations?.get(cluster.signature);
     lines.push(
-      `P${i} ${cause} n=${cluster.size}${conf}${noul}${blocks}  action=${cluster.action}${reason}${history ? `  ${history}` : ""}`,
+      `P${i} ${cause} n=${cluster.size}${conf}${noul}${blocks}  action=${cluster.action}${reason}${cached}${history ? `  ${history}` : ""}`,
     );
     const head = cluster.representative_error.replace(/\s+/g, " ").slice(0, 72);
     lines.push(`     ${head}`);
@@ -70,6 +71,9 @@ export function formatMarkdown(
     lines.push(`## P${i} ${cluster.cause ?? "unscored"} (n=${cluster.size})`);
     lines.push("");
     lines.push(`- action: \`${cluster.action}\`${cluster.action_reason ? ` (${cluster.action_reason})` : ""}`);
+    if (cluster.cached) {
+      lines.push(`- cached: true`);
+    }
     const history = annotations?.get(cluster.signature);
     if (history) {
       lines.push(`- history: ${history}`);

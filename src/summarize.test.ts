@@ -68,3 +68,12 @@ test("suppressed clusters are counted in the header but not listed", () => {
     /\(2 suppressed\)/,
   );
 });
+
+test("a reused judgment is marked cached in the terminal and the markdown", () => {
+  const cached: ScoredCluster = { ...cluster, cached: true };
+  assert.match(formatScoredTerminal([cached], 5), /\[cached\]/);
+  assert.match(
+    formatMarkdown([cached], 5, { workers: 1, retries_config: 0 }),
+    /- cached: true/,
+  );
+});

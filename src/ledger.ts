@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
 import type { ScoredCluster } from "./types.ts";
 
@@ -29,22 +29,40 @@ export type ClusterStats = {
   failed_total: number;
 };
 
+/** A Jev judgment keyed by signature, reused across runs to avoid re-paying. */
+export type CachedJudgment = {
+  cause?: string;
+  cause_confidence?: number;
+  same_root?: number;
+  blocks_merge?: number;
+  jev_action?: string;
+  severity?: number;
+  model?: string;
+};
+
 export type History = {
   version: 1;
   runs: RunRecord[];
   /** Signature patterns marked as known noise; `*` is a wildcard. */
   suppressed: string[];
+  /** Last Jev answer per signature. */
+  judgments: Record<string, CachedJudgment>;
 };
 
 export const DEFAULT_STORE = ".latch/store.json";
 export const MAX_RUNS = 100;
+export const MAX_JUDGMENTS = 500;
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+}
 
 export function storePath(): string {
   return process.env.LATCH_STORE ?? DEFAULT_STORE;
 }
 
 export function emptyHistory(): History {
-  return { version: 1, runs: [], suppressed: [] };
+  return { version: 1, runs: [], suppressed: [], judgments: {} };
 }
 
 function usableRun(run: unknown): run is RunRecord {
@@ -56,22 +74,33 @@ export function loadHistory(path: string): History {
   if (!path || !existsSync(path)) return emptyHistory();
   try {
     const parsed = JSON.parse(readFileSync(path, "utf8")) as Partial<History>;
+    const judgments: Record<string, CachedJudgment> = {};
+    if (isRecord(parsed.judgments)) {
+      for (const [signature, value] of Object.entries(parsed.judgments)) {
+        if (isRecord(value)) judgments[signature] = value as CachedJudgment;
+      }
+    }
     return {
       version: 1,
       runs: Array.isArray(parsed.runs) ? parsed.runs.filter(usableRun) : [],
       suppressed: Array.isArray(parsed.suppressed)
         ? parsed.suppressed.filter((entry): entry is string => typeof entry === "string")
         : [],
+      judgments,
     };
   } catch {
     return emptyHistory();
   }
 }
 
+/** Write the store atomically so a concurrent or interrupted save cannot corrupt it. */
 export function saveHistory(history: History, path: string): void {
   if (!path) return;
   mkdirSync(dirname(path), { recursive: true });
-  writeFileSync(path, `${JSON.stringify(history, null, 2)}\n`);
+  const body = `${JSON.stringify(history, null, 2)}\n`;
+  const temp = `${path}.${process.pid}.tmp`;
+  writeFileSync(temp, body);
+  renameSync(temp, path);
 }
 
 /** Per-signature aggregates across the runs kept in the store. */
@@ -199,7 +228,22 @@ export function persistRun(
   history: History | undefined,
   clusters: ScoredCluster[],
   totalFailed: number,
+  cache?: Map<string, CachedJudgment>,
 ): void {
   if (!store) return;
-  saveHistory(appendRun(history ?? emptyHistory(), buildRecord(clusters, totalFailed)), store);
+  const base = history ?? emptyHistory();
+  const merged = cache ? withJudgments(base, cache) : base;
+  saveHistory(appendRun(merged, buildRecord(clusters, totalFailed)), store);
+}
+
+export function judgmentCache(history: History): Map<string, CachedJudgment> {
+  return new Map(Object.entries(history.judgments));
+}
+
+/** Merge a cache back into history, keeping the most recent MAX_JUDGMENTS entries. */
+export function withJudgments(history: History, cache: Map<string, CachedJudgment>): History {
+  return {
+    ...history,
+    judgments: Object.fromEntries([...cache.entries()].slice(-MAX_JUDGMENTS)),
+  };
 }

@@ -1,5 +1,6 @@
 import { TypeSafeClient } from "@typesafe-ai/sdk";
 import { askJev, parseJevAnswers } from "./jev.ts";
+import type { CachedJudgment } from "./ledger.ts";
 import { hasApiKey } from "./load-env.ts";
 import { decideAction } from "./policy.ts";
 import { redactSecrets } from "./redact.ts";
@@ -33,34 +34,81 @@ function unscored(cluster: Cluster, reason: string): ScoredCluster {
   return { ...cluster, scored: false, action: "needs_human", action_reason: reason };
 }
 
+/** Apply the code policy to a Jev answer, fresh or reused. */
+function scored(cluster: Cluster, answers: CachedJudgment, cached: boolean): ScoredCluster {
+  const { action, reason } = decideAction({
+    cause: answers.cause,
+    cause_confidence: answers.cause_confidence,
+    same_root: answers.same_root,
+    blocks_merge: answers.blocks_merge,
+    flaky_count: cluster.flaky_count,
+    jev_action: answers.jev_action,
+  });
+  return {
+    ...cluster,
+    scored: true,
+    cached,
+    cause: answers.cause,
+    cause_confidence: answers.cause_confidence,
+    same_root: answers.same_root,
+    blocks_merge: answers.blocks_merge,
+    jev_action: answers.jev_action,
+    severity: answers.severity,
+    action,
+    action_reason: reason,
+    model: answers.model,
+  };
+}
+
+export type ScorePlanItem = {
+  cluster: Cluster;
+  mode: "cached" | "fresh" | "skip";
+  cached?: CachedJudgment;
+};
+
+/**
+ * Decide, per cluster, whether it is answered from the cache, sent to Jev, or
+ * left out because the fresh-call budget is spent. Cached clusters are free, so
+ * they do not count against the cap.
+ */
+export function planScoring(
+  clusters: Cluster[],
+  cache: Map<string, CachedJudgment> | undefined,
+  maxJev: number,
+): ScorePlanItem[] {
+  let fresh = 0;
+  return clusters.map((cluster) => {
+    const cached = cache?.get(cluster.signature);
+    if (cached) return { cluster, mode: "cached", cached };
+    if (fresh < maxJev) {
+      fresh += 1;
+      return { cluster, mode: "fresh" };
+    }
+    return { cluster, mode: "skip" };
+  });
+}
+
 async function scoreOne(
   client: TypeSafeClient,
   cluster: Cluster,
   run: RunMeta,
+  cache: Map<string, CachedJudgment> | undefined,
 ): Promise<ScoredCluster> {
   try {
     const jev = await askJev(toState(cluster, run), client);
     const parsed = parseJevAnswers(jev.answers);
-    const { action, reason } = decideAction({
-      cause: parsed.cause,
-      cause_confidence: parsed.cause_confidence,
-      same_root: parsed.same_root,
-      blocks_merge: parsed.blocks_merge,
-      flaky_count: cluster.flaky_count,
-      jev_action: parsed.action,
-    });
-    return {
-      ...cluster,
-      scored: true,
+    const judgment: CachedJudgment = {
       cause: parsed.cause,
       cause_confidence: parsed.cause_confidence,
       same_root: parsed.same_root,
       blocks_merge: parsed.blocks_merge,
       jev_action: parsed.action,
       severity: parsed.severity,
-      action,
-      action_reason: reason,
       model: jev.model,
+    };
+    cache?.set(cluster.signature, judgment);
+    return {
+      ...scored(cluster, judgment, false),
       usage: jev.usage,
       latency_ms: jev.latency_ms,
       cost_estimate_usd: jev.cost_estimate_usd,
@@ -93,17 +141,22 @@ export async function scoreClusters(
   clusters: Cluster[],
   run: RunMeta,
   maxJev = MAX_JEV_CLUSTERS,
+  cache?: Map<string, CachedJudgment>,
 ): Promise<ScoredCluster[]> {
   if (clusters.length === 0) return [];
+
   if (!hasApiKey()) {
-    return clusters.map((cluster) => unscored(cluster, "no_key"));
+    return clusters.map((cluster) => {
+      const cached = cache?.get(cluster.signature);
+      return cached ? scored(cluster, cached, true) : unscored(cluster, "no_key");
+    });
   }
 
+  const plan = planScoring(clusters, cache, maxJev);
   const client = new TypeSafeClient();
-  const head = clusters.slice(0, maxJev);
-  const scored = await mapLimit(head, MAX_JEV_CONCURRENCY, (cluster) =>
-    scoreOne(client, cluster, run),
-  );
-  const tail = clusters.slice(maxJev).map((cluster) => unscored(cluster, "unscored"));
-  return [...scored, ...tail];
+  return mapLimit(plan, MAX_JEV_CONCURRENCY, async (item) => {
+    if (item.mode === "cached") return scored(item.cluster, item.cached!, true);
+    if (item.mode === "skip") return unscored(item.cluster, "unscored");
+    return scoreOne(client, item.cluster, run, cache);
+  });
 }
