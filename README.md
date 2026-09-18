@@ -53,12 +53,12 @@ $ npm run demo
 
 === 1) an infra outage (8 identical connection errors) ===
 Latch: 8 failed → 1 cause
-P0 env_cascade n=8 conf=1.00 same_root=0.90 blocks=0.40  action=ignore_as_infra (env_cascade)
+P0 env_cascade n=8 conf=1.00 same_root=0.90 blocks=0.40  action=ignore_as_infra (env_cascade) [cached]  [new]
 Gate: PASS (no blocking cluster)                    # exit 0 — merge
 
 === 2) a real regression (5 failing assertions) ===
 Latch: 5 failed → 1 cause
-P0 assertion_bug n=5 conf=1.00 same_root=0.80 blocks=0.60  action=fix_product (assertion_bug)
+P0 assertion_bug n=5 conf=1.00 same_root=0.80 blocks=0.60  action=fix_product (assertion_bug) [cached]  [new]
 Gate: BLOCK — 1 cluster to look at                  # exit 1 — do not merge
 ```
 
@@ -78,6 +78,8 @@ reporter: [["list"], ["./src/reporter.ts"]]
 ```
 
 One key in `.env`: `TYPESAFE_API_KEY`. Missing key still prints clusters (`needs_human` / `no_key`) and never fails Playwright.
+
+Optional: `LATCH_MODEL` (default `jev-latest`), `LATCH_STORE` (ledger path), `LATCH_INPUT_USD_PER_MTOK`, `LATCH_OUTPUT_USD_PER_MTOK` (cost estimate only).
 
 Then gate your CI:
 
